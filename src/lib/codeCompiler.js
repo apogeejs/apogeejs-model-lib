@@ -1,5 +1,5 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {KEYWORDS, EXCLUSION_NAMES, analyzeCode} from "/apogee/lib/codeAnalysis.js"; 
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import {KEYWORDS, EXCLUSION_NAMES, analyzeCode} from "/apogeejs-model-lib/src/lib/codeAnalysis.js"; 
 
 /** @private */
 const APOGEE_FORBIDDEN_NAMES = {

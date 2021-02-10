@@ -1,4 +1,4 @@
-import {doAction} from "/apogee/actions/action.js";
+import {doAction} from "/apogeejs-model-lib/src/actions/action.js";
 
 /** This is a messenger class for sending action messages. 
  * If the send fails, and exception will be thrown. */

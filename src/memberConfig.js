@@ -1,6 +1,6 @@
 //These are self installing table types. They have no exports. */
-import "/apogee/data/JsonTable.js";
-import "/apogee/data/FunctionTable.js";
-import "/apogee/data/Folder.js";
-import "/apogee/data/FolderFunction.js";
-import "/apogee/data/ErrorTable.js";
+import "/apogeejs-model-lib/src/data/JsonTable.js";
+import "/apogeejs-model-lib/src/data/FunctionTable.js";
+import "/apogeejs-model-lib/src/data/Folder.js";
+import "/apogeejs-model-lib/src/data/FolderFunction.js";
+import "/apogeejs-model-lib/src/data/ErrorTable.js";

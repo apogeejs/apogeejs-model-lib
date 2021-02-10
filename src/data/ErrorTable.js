@@ -1,6 +1,6 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import Model from "/apogee/data/Model.js";
-import Member from "/apogee/datacomponents/Member.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import Model from "/apogeejs-model-lib/src/data/Model.js";
+import Member from "/apogeejs-model-lib/src/datacomponents/Member.js";
 
 /** This class encapsulatees a table with no specific functionality. It
  * is intended to be used as a placeholder when a table generator is not found. */

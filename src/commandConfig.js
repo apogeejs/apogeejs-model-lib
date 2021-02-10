@@ -1,9 +1,9 @@
 /** These are self installing commands. They have no exports. */
-import "/apogee/actions/createmember.js";
-import "/apogee/actions/updatemember.js";
-import "/apogee/actions/movemember.js";
-import "/apogee/actions/deletemember.js";
-import "/apogee/actions/updatefolderfunction.js";
-import "/apogee/actions/loadmodel.js";
-import "/apogee/actions/updatemodel.js";
-import "/apogee/actions/setfield.js";
+import "/apogeejs-model-lib/src/actions/createmember.js";
+import "/apogeejs-model-lib/src/actions/updatemember.js";
+import "/apogeejs-model-lib/src/actions/movemember.js";
+import "/apogeejs-model-lib/src/actions/deletemember.js";
+import "/apogeejs-model-lib/src/actions/updatefolderfunction.js";
+import "/apogeejs-model-lib/src/actions/loadmodel.js";
+import "/apogeejs-model-lib/src/actions/updatemodel.js";
+import "/apogeejs-model-lib/src/actions/setfield.js";

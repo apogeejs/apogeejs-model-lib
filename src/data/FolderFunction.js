@@ -1,10 +1,10 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {doAction} from "/apogee/actions/action.js";
-import Model from "/apogee/data/Model.js";
-import ContextManager from "/apogee/lib/ContextManager.js";
-import DependentMember from "/apogee/datacomponents/DependentMember.js";
-import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
-import Parent from "/apogee/datacomponents/Parent.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import {doAction} from "/apogeejs-model-lib/src/actions/action.js";
+import Model from "/apogeejs-model-lib/src/data/Model.js";
+import ContextManager from "/apogeejs-model-lib/src/lib/ContextManager.js";
+import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMember.js";
+import ContextHolder from "/apogeejs-model-lib/src/datacomponents/ContextHolder.js";
+import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */

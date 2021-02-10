@@ -1,5 +1,5 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import Member from "/apogee/datacomponents/Member.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import Member from "/apogeejs-model-lib/src/datacomponents/Member.js";
 
 /** This mixin encapsulates an member whose value depends on on another
  * member. The dependent allows for a recalculation based on an update of the 

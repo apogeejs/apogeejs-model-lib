@@ -1,8 +1,8 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {EventManager,FieldObject} from "/apogeebase/apogeeBaseLib.js";
-import ContextManager from "/apogee/lib/ContextManager.js";
-import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
-import Parent from "/apogee/datacomponents/Parent.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import {EventManager,FieldObject} from "/apogeejs-base-lib/src/apogeeBaseLib.js";
+import ContextManager from "/apogeejs-model-lib/src/lib/ContextManager.js";
+import ContextHolder from "/apogeejs-model-lib/src/datacomponents/ContextHolder.js";
+import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
 
 /** This is the model. 
  * -instanceToCopy - if the new instance should be a copy of an existing instance, this

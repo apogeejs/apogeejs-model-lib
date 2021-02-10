@@ -1,10 +1,10 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import Messenger from "/apogee/actions/Messenger.js";
-import {processCode} from "/apogee/lib/codeCompiler.js"; 
-import {getDependencyInfo} from "/apogee/lib/codeDependencies.js";
-import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
-import ContextManager from "/apogee/lib/ContextManager.js";
-import DependentMember from "/apogee/datacomponents/DependentMember.js"
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import Messenger from "/apogeejs-model-lib/src/actions/Messenger.js";
+import {processCode} from "/apogeejs-model-lib/src/lib/codeCompiler.js"; 
+import {getDependencyInfo} from "/apogeejs-model-lib/src/lib/codeDependencies.js";
+import ContextHolder from "/apogeejs-model-lib/src/datacomponents/ContextHolder.js";
+import ContextManager from "/apogeejs-model-lib/src/lib/ContextManager.js";
+import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMember.js"
 
 /** This mixin encapsulates an object in that can be coded. It contains a function
  * and supplemental code. Object that are codeable should also be a member and

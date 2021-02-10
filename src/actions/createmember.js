@@ -1,5 +1,5 @@
-import {addActionInfo} from "/apogee/actions/action.js";
-import Model from "/apogee/data/Model.js";
+import {addActionInfo} from "/apogeejs-model-lib/src/actions/action.js";
+import Model from "/apogeejs-model-lib/src/data/Model.js";
 
 /** This is self installing command module. This must be imported to install the command.
  * Note that this module also contains an export, unlike most command modules. 

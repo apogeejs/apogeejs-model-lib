@@ -1,4 +1,4 @@
-import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} from "/apogee/lib/modelCalculation.js";
+import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} from "/apogeejs-model-lib/src/lib/modelCalculation.js";
 
 /**
  * Action Module

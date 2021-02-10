@@ -1,6 +1,6 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import Model from "/apogee/data/Model.js";
-import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import Model from "/apogeejs-model-lib/src/data/Model.js";
+import CodeableMember from "/apogeejs-model-lib/src/datacomponents/CodeableMember.js";
 
 /** This class encapsulatees a data table for a JSON object. 
  * (This object does also support function objects as elements of the json, though

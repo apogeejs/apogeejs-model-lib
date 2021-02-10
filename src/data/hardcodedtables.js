@@ -1,7 +1,7 @@
 
-import Model from "/apogee/data/Model.js";
-import JsonTable from "/apogee/data/JsonTable.js";
-import FunctionTable from "/apogee/data/FunctionTable.js";
+import Model from "/apogeejs-model-lib/src/data/Model.js";
+import JsonTable from "/apogeejs-model-lib/src/data/JsonTable.js";
+import FunctionTable from "/apogeejs-model-lib/src/data/FunctionTable.js";
 
 /** This function defines a JsonTable that is hard coded. It is automatically added to
  * the workspace under the name typeName. */

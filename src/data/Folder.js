@@ -1,9 +1,9 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import Model from "/apogee/data/Model.js";
-import DependentMember from "/apogee/datacomponents/DependentMember.js";
-import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
-import ContextManager from "/apogee/lib/ContextManager.js";
-import Parent from "/apogee/datacomponents/Parent.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import Model from "/apogeejs-model-lib/src/data/Model.js";
+import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMember.js";
+import ContextHolder from "/apogeejs-model-lib/src/datacomponents/ContextHolder.js";
+import ContextManager from "/apogeejs-model-lib/src/lib/ContextManager.js";
+import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
 
 /** This is a folder. */
 export default class Folder extends DependentMember {

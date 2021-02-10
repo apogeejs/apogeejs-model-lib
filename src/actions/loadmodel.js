@@ -1,6 +1,6 @@
-import {addActionInfo} from "/apogee/actions/action.js";
-import {createMember} from "/apogee/actions/createmember.js";
-import Model from "/apogee/data/Model.js";
+import {addActionInfo} from "/apogeejs-model-lib/src/actions/action.js";
+import {createMember} from "/apogeejs-model-lib/src/actions/createmember.js";
+import Model from "/apogeejs-model-lib/src/data/Model.js";
 
 /** This is self installing command module. It has no exports
  * but it must be imported to install the command. 

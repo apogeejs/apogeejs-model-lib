@@ -1,0 +1,7 @@
+{
+    "repoName": "apogeejs-base-lib",
+    "alias": "apogeeutil",
+    "repoPath": "/apogeejs-base-lib",
+    "repoSrcPath": "/src",
+    "repoBuildPath": "/build"
+}
