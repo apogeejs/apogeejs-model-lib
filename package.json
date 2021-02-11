@@ -13,14 +13,24 @@
     },
     "dependencies": {
         "apogeejs-base-lib": "^2.0.0",
-        "apogeejs-util-lib": "^2.0.0"
+        "apogeejs-util-lib": "^2.0.0",
+        "esprima": "2.7.3"
     },
     "config": {
-        "externalModuleMap": {
-            "/apogeebase/apogeeBaseLib.js": "apogeejs-base-lib", 
-            "/apogeeutil/apogeeUtilLib.js": "apogeejs-util-lib",
-            "/apogeejs-admin/ext/esprima/esprima_2.7.3/esprima.es.js": "esprima"
-        },
-        "localPathAlias": "apogee"
+        "external": {
+            "/apogeejs-base-lib/src/apogeeBaseLib.js": {
+                "es": "/apogeejs-base-lib/src/apogeeBaseLib.js",
+                "es-release": "/apogeejs-admin/releases/apogeejs-base-lib/v2.0.0-p1/apogeeBaseLib.js",
+                "npm": "apogeejs-base-lib"
+            },
+            "/apogeejs-util-lib/src/apogeeUtilLib.js": {
+                "es": "/apogeejs-util-lib/src/apogeeUtilLib.js",
+                "npm": "apogeejs-util-lib"
+            },
+            "/apogeejs-admin/ext/esprima/esprima_2.7.3/esprima.es.js": {
+                "es": "/apogeejs-admin/ext/esprima/esprima_2.7.3/esprima.es.js",
+                "npm": "esprima"
+            }
+        }
     }
 }
