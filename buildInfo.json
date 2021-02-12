@@ -1,0 +1,8 @@
+{
+    "filesToCopy": [
+        "/apogeejs-model-lib/package.json",
+        "/apogeejs-model-lib/src/webGlobals.js",
+        "/apogeejs-model-lib/src/nodeGlobals.js",
+        "/apogeejs-model-lib/src/debugHook.js"
+    ]
+}
