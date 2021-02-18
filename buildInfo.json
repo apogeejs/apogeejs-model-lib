@@ -1,8 +1,32 @@
 {
-    "filesToCopy": [
-        "/apogeejs-model-lib/package.json",
+    "repoName": "apogeejs-model-lib",
+    "isProductionRelease": false,
+
+    "makeEsModule": true,
+    "esModuleFileName": "apogeeModelLib.js",
+    "esFilesToCopyUrls": [
+        "/apogeejs-model-lib/versionInfo.json",
+        "/apogeejs-model-lib/src/debugHook.js",
         "/apogeejs-model-lib/src/webGlobals.js",
-        "/apogeejs-model-lib/src/nodeGlobals.js",
-        "/apogeejs-model-lib/src/debugHook.js"
-    ]
+        "/apogeejs-model-lib/src/nodeGlobals.js"
+    ],
+    "esExternalLibs": [
+        "/apogeejs-base-lib/src/apogeeBaseLib.js",
+        "/apogeejs-util-lib/src/apogeeUtilLib.js"
+    ],
+    "esExternalLibRemapping": {},
+
+    "makeNpmModule": true,
+    "npmModuleFileName": "apogee-core-lib.js",
+    "npmFilesToCopyUrls": [
+        "/apogeejs-model-lib/package.json"
+    ],
+    "npmExternalLibs": [
+        "/apogeejs-admin/ext/esprima/esprima_2.7.3/esprima.es.js"
+    ],
+    "npmExternalLibRemapping": {
+        "/apogeejs-admin/ext/esprima/esprima_2.7.3/esprima.es.js": "esprima"
+    },
+
+    "__NOTES__": "For this library, we do a NPM release that bundles the external apogee libs: util and base. The NPM release is published for use in apogee server. The ES module is kept as internal only."
 }
