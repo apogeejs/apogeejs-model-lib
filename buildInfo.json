@@ -1,6 +1,5 @@
 {
     "repoName": "apogeejs-model-lib",
-    "isProductionRelease": false,
 
     "makeEsModule": true,
     "esModuleFileName": "apogeeModelLib.js",
