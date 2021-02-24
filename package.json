@@ -1,7 +1,7 @@
 {
     "DEV_RELEASE": true,
     "name": "apogeejs-core-lib",
-    "version": "2.0.0-p1",
+    "version": "[RELEASE_VERSION]",
     "description": "This library forms the model layer of the apogee app.",
     "homepage": "https://www.apogeejs.com",
     "license": "MIT",
