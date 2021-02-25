@@ -2,7 +2,6 @@
     "repoName": "apogeejs-model-lib",
 
     "esModule": {
-        "format": "es",
         "taskList": [
             {
                 "type": "copyFileList",
@@ -30,7 +29,6 @@
         ]
     },
     "npmModule": {
-        "format": "cjs",
         "taskList": [
             {
                 "type": "copyAndReplace",
@@ -45,12 +43,16 @@
             {
                 "type": "packageLib",
                 "esModuleFileName": "apogeeModelLib.js",
-                "npmModuleFileName": "apogee-core-libLib.js",
+                "npmModuleFileName": "apogeejs-model-lib.js",
                 "externalLibs": [
-                    "/apogeejs-admin/ext/esprima/esprima_2.7.3/esprima.es.js"
+                    "/apogeejs-admin/ext/esprima/esprima_2.7.3/esprima.es.js",
+                    "/apogeejs-base-lib/src/apogeeBaseLib.js",
+                    "/apogeejs-util-lib/src/apogeeUtilLib.js"
                 ],
-                "externalLibsMapping": {
-                    "/apogeejs-admin/ext/esprima/esprima_2.7.3/esprima.es.js": "esprima"
+                "externalLibMapping": {
+                    "/apogeejs-admin/ext/esprima/esprima_2.7.3/esprima.es.js": "esprima",
+                    "/apogeejs-base-lib/src/apogeeBaseLib.js": "apogeejs-base-lib",
+                    "/apogeejs-util-lib/src/apogeeUtilLib.js": "apogeejs-util-lib"
                 }
             }
         ]

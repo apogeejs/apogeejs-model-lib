@@ -1,12 +1,12 @@
 {
     "DEV_RELEASE": true,
-    "name": "apogeejs-core-lib",
+    "name": "apogeejs-model-lib",
     "version": "[RELEASE_VERSION]",
     "description": "This library forms the model layer of the apogee app.",
     "homepage": "https://www.apogeejs.com",
     "license": "MIT",
     "author": "Dave Sutter",
-    "main": "apogeejs-core-lib.js",
+    "main": "./src/apogeejs-model-lib.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/sutter-dave/apogeejs-model-lib.git"
