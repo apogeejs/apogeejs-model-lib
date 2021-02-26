@@ -1,9 +1,5 @@
 {
     "version": "2.0.0-p1",
     "isProductionRelease": false,
-    "buildInfoUrl": "/apogeejs-model-lib/buildInfo.json", 
-    "pathMapping": {},
-    "replacementValues": {
-        "RELEASE_VERSION": "2.0.0-p1"
-    }
+    "buildInfoUrl": "/apogeejs-model-lib/buildInfo.json"
 }
