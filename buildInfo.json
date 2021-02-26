@@ -36,7 +36,8 @@
                 "replacementList": [
                     {
                         "marker": "[RELEASE_VERSION]",
-                        "libVersion": "this"
+                        "lib": "this",
+                        "type": "version"
                     }
                 ]
             },
