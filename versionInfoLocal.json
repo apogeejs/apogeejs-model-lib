@@ -1,5 +1,6 @@
 {
-    "version": "2.0.0-p1",
+    "version": "2.0.0-local",
+    "suppressReleasePresentCheck": true,
     "isProductionRelease": false,
     "buildInfoUrl": "/apogeejs-model-lib/buildInfo.json",
     "dependentVersions": {
@@ -7,7 +8,7 @@
         "apogeejs-util-lib": {"version": "2.0.0-p1", "isProductionRelease": false}
     },
     "additionalValues": {
-        "APOGEE_BASE_DEP_VERSION": "2.0.0-p1",
-        "APOGEE_UTIL_DEP_VERSION": "2.0.0-p1"
+        "APOGEE_BASE_DEP_VERSION": "../../apogeejs-base-lib/v2.0.0-p1",
+        "APOGEE_UTIL_DEP_VERSION": "../../apogeejs-util-lib/v2.0.0-p1"
     }
 }
