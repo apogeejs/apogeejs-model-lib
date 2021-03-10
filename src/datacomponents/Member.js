@@ -179,6 +179,14 @@ export default class Member extends FieldObject {
         else return [];
     }
 
+    /** This method returns the error value data, which is a substitute value to be displayed
+     * when the member is in an error state. It should be called only when the state is error. */
+    getErrorValueData() {
+        let stateStruct = this.getField("state");
+        if((stateStruct)&&(stateStruct.error)) return stateStruct.error.valueData;
+        else return undefined;
+    }
+
     /** This returns the list of errors. The entries can be javscript Error objects, members (signifying a
      * dependency error), strings or other objects (which should be converted to strings). 
      * @deprecated*/
@@ -422,17 +430,8 @@ export default class Member extends FieldObject {
         }
         let dependsOnError = new Error(errorMsg);
         dependsOnError.isDependsOnError = true;
-        Member.appendErrorInfo(dependsOnError,dependsOnErrorInfo);
+        apogeeutil.appendErrorInfo(dependsOnError,dependsOnErrorInfo);
         return dependsOnError;
-    }
-
-    /** This method adds the extended info to the error. It allows for multiple
-     * error infos to be added. */
-    static appendErrorInfo(error,errorInfo) {
-        if(!error.errorInfoList) {
-            error.errorInfoList = [];
-        }
-        error.errorInfoList.push(errorInfo);
     }
 }
 

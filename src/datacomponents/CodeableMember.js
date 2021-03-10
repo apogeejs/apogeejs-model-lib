@@ -185,7 +185,7 @@ export default class CodeableMember extends DependentMember {
         }
         else if(!compiledInfo.valid) {
             let error = new Error(compiledInfo.errorMsg ? compiledInfo.errorMsg : "Unknown error parsing user code");
-            if(compiledInfo.errorInfo) CodeableMember.appendErrorInfo(error,compiledInfo.errorInfo);
+            if(compiledInfo.errorInfo) apogeeutil.appendErrorInfo(error,compiledInfo.errorInfo);
             this.setError(model,error);
             this.clearCalcPending();
             return;
@@ -229,7 +229,7 @@ export default class CodeableMember extends DependentMember {
                 if(error.stack) errorInfo.stack = error.stack;
                 errorInfo.memberTrace = CodeableMember.recallMemberTraceInfo(error);
 
-                CodeableMember.appendErrorInfo(error,errorInfo);
+                apogeeutil.appendErrorInfo(error,errorInfo);
 
                 this.setError(model,error);
             }
@@ -269,7 +269,8 @@ export default class CodeableMember extends DependentMember {
                 let error = this.getError();
                 if(error) {
                     updateData.error = error.toString();
-                    updateData.errorInfoList = error.errorInfoList;
+                    if(error.errorInfoList !== undefined) updateData.errorInfoList = error.errorInfoList;
+                    if(error.valueData !== undefined) updateData.errorValueData = error.valueData;
                 }
                 else {
                     updateData.error = "Unknown Error"; //unknonwn error
@@ -303,7 +304,10 @@ export default class CodeableMember extends DependentMember {
                 //reconstruct the error
                 let error = new Error(initialData.error);
                 if(initialData.errorInfoList) {
-                    initialData.errorInfoList.forEach(errorInfo => CodeableMember.appendErrorInfo(errorInfo));
+                    initialData.errorInfoList.forEach(errorInfo => apogeeutil.appendErrorInfo(errorInfo));
+                }
+                if(initialData.errorValueData) {
+                    error.valueData = initialData.errorValueData;
                 }
                 this.setError(model,error);
             }
