@@ -14,6 +14,6 @@
     "dependencies": {
         "esprima": "2.7.3",
         "apogeejs-util-lib": "[APOGEE_UTIL_DEP_VERSION]",
-    "apogeejs-base-lib": "[APOGEE_BASE_DEP_VERSION]"
+        "apogeejs-base-lib": "[APOGEE_BASE_DEP_VERSION]"
     }
 }
