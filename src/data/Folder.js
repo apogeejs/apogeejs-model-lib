@@ -241,7 +241,6 @@ apogeeutil.mixin(Folder,Parent);
 
 
 Folder.generator = {};
-Folder.generator.displayName = "Folder";
 Folder.generator.type = "apogee.Folder";
 Folder.generator.createMember = Folder.fromJson;
 Folder.generator.setDataOk = false;
