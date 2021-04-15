@@ -522,6 +522,11 @@ export default class Model extends FieldObject {
         memberGenerators[generator.type] = generator;
     }
 
+    /** This method registers the member generator for a given named type. */
+    static removeMemberGenerator(type) {
+        delete memberGenerators[type];
+    }
+
 }
 
 //add mixins to this class

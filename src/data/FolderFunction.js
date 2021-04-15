@@ -390,7 +390,6 @@ FolderFunction.INTERNAL_FOLDER_NAME = "body";
 //============================
 
 FolderFunction.generator = {};
-FolderFunction.generator.displayName = "Folder Function";
 FolderFunction.generator.type = "apogee.FolderFunction";
 FolderFunction.generator.createMember = FolderFunction.fromJson;
 FolderFunction.generator.readProperties = FolderFunction.readProperties;

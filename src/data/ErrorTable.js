@@ -73,7 +73,6 @@ export default class ErrorTable extends Member {
 //============================
 
 ErrorTable.generator = {};
-ErrorTable.generator.displayName = "Error Member";
 ErrorTable.generator.type = "apogee.ErrorMember";
 ErrorTable.generator.createMember = ErrorTable.fromJson;
 ErrorTable.generator.setDataOk = false;

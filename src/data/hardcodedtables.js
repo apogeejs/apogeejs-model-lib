@@ -5,7 +5,7 @@ import FunctionTable from "/apogeejs-model-lib/src/data/FunctionTable.js";
 
 /** This function defines a JsonTable that is hard coded. It is automatically added to
  * the workspace under the name typeName. */
-export function defineHardcodedJsonTable(displayName,typeName,functionBody,optionalPrivateCode) {
+export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCode) {
 
     class HardcodedJsonTable extends JsonTable {
 
@@ -36,7 +36,6 @@ export function defineHardcodedJsonTable(displayName,typeName,functionBody,optio
     }
 
     HardcodedJsonTable.generator = {};
-    HardcodedJsonTable.generator.displayName = displayName;
     HardcodedJsonTable.generator.type = typeName;
     HardcodedJsonTable.generator.createMember = HardcodedJsonTable.fromJson;
     HardcodedJsonTable.generator.setDataOk = false;
@@ -48,7 +47,7 @@ export function defineHardcodedJsonTable(displayName,typeName,functionBody,optio
 
 /** This function defines a FunctionTable thatis hard coded. It is automatically added to
  * the workspace under the name typeName. */
-export function defineHardcodedFunctionTable(displayName,typeName,argListArray,functionBody,optionalPrivateCode) {
+export function defineHardcodedFunctionTable(typeName,argListArray,functionBody,optionalPrivateCode) {
 
     class HardcodedFunctionTable extends FunctionTable {
 
@@ -79,7 +78,6 @@ export function defineHardcodedFunctionTable(displayName,typeName,argListArray,f
     }
 
     HardcodedFunctionTable.generator = {};
-    HardcodedFunctionTable.generator.displayName = displayName;
     HardcodedFunctionTable.generator.type = typeName;
     HardcodedFunctionTable.generator.createMember = HardcodedFunctionTable.fromJson;
     HardcodedFunctionTable.generator.setDataOk = false;
