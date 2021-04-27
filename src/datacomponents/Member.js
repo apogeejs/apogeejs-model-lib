@@ -163,7 +163,7 @@ export default class Member extends FieldObject {
     getErrorMsg() {
         let stateStruct = this.getField("state");
         if((stateStruct)&&(stateStruct.error)) {
-            return stateStruct.error.toString();
+            return stateStruct.error.message ? stateStruct.error.message : stateStruct.error.toString();
         }
         else {
             //this shouldn't happen if the state is actually an error state
@@ -300,12 +300,12 @@ export default class Member extends FieldObject {
             actionData.data = memberValue;
             model.doFutureAction(actionData);
         }
-        var asynchErrorCallback = errorMsg => {
+        var asynchErrorCallback = error => {
             let actionData = {};
             actionData.action = "updateData";
             actionData.memberId = this.getId();
             actionData.sourcePromise = promise;
-            actionData.data = new Error(errorMsg);
+            actionData.data = error;
             model.doFutureAction(actionData);
         }
 

@@ -88,7 +88,7 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
     }
     catch(ex) {
         //this is for parse errors not captured in esprmia
-        compiledInfo.errorMsg = ex.toString();
+        compiledInfo.errorMsg = ex.message ? ex.message : ex ? ex.toString() : "Unknown";
         let errorInfo = {};
         errorInfo.type = "javascriptParseError";
         errorInfo.description = compiledInfo.errorMsg;

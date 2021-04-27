@@ -603,7 +603,7 @@ function createErrorInfoFromInternalError(functionText,internalError) {
     let errorInfo = {};
     errorInfo.type = "esprimaParseError";
     errorInfo.description = "Error parsing code: " + internalError.description;
-    let errorMsg = internalError.toString();
+    let errorMsg =  internalError.message ? internalError.message : internalError ? internalError.toString() : "Unknown";
     let errorData = {};
     if(internalError.lineNumber !== undefined) errorData.lineNumber = internalError.lineNumber;
     if(internalError.index !== undefined) errorData.index = internalError.index;

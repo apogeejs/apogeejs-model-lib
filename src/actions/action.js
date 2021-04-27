@@ -227,7 +227,7 @@ function internalDoAction(model,actionData) {
 	catch(error) {
         if(error.stack) console.error(error.stack);
         success = false;
-        errorMsg = "Unknown error updating model: " + error.message
+        errorMsg = "Unknown error updating model: " + error.message ? error.message : error ? error.toString() : "Unknown";
     }
 
     //flag action in progress
