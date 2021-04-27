@@ -323,10 +323,8 @@ export default class FolderFunction extends DependentMember {
                             return returnValueMember.getData();
 
                         case apogeeutil.STATE_ERROR:
-                            //we should do better than this...
-                            let error = returnValueMember.getError();
-                            if(error) throw error;
-                            else throw new Error("Error in function " + this.getName());
+                            let error = this.getModelError(instanceVirtualModel);
+                            throw error;
 
                         case apogeeutil.STATE_PENDING:
                             throw new Error("Error; asynchrnous functions not supporred!");
@@ -376,6 +374,26 @@ export default class FolderFunction extends DependentMember {
         if(returnValueMember) return returnValueMember.getId();
         else return null;
     }
+
+    /** This method loads any errors from within the folder function. 
+     * @private  */
+    getModelError(model) {
+        let memberMap = model.getField("memberMap");
+        let errorMessages = [];
+        //load error messages from each non-dependency error in the folder function
+        for(let id in memberMap) {
+            let member = memberMap[id];
+            if((member.isMember)&&(member.getState() == apogeeutil.STATE_ERROR)) {
+                let error = member.getError();
+                if(!error.isDependsOnError) {
+                    let errorDesc = error.message ? error.message : error.toString();
+                    errorMessages.push(`Member ${member.getName()}: ${errorDesc}`);
+                }
+            }
+        }
+        let errorMsgList = errorMessages.join("; ");
+        return new Error(`Error in function call ${this.getName()}: ${errorMsgList}`);
+    }
 }
 
 //add components to this class
@@ -399,7 +417,6 @@ FolderFunction.generator.setCodeOk = false;
 
 //register this member
 Model.addMemberGenerator(FolderFunction.generator);
-
 
 
 //////////////////////////////////////////////////////////////////
