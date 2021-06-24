@@ -1,4 +1,3 @@
-import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import {KEYWORDS, EXCLUSION_NAMES, analyzeCode} from "/apogeejs-model-lib/src/lib/codeAnalysis.js"; 
 
 /** @private */
@@ -10,7 +9,8 @@ const APOGEE_FORBIDDEN_NAMES = {
     "__memberFunctionDebugHook": true
 }
 
-/** @private */
+/** This test for a valid member name, including tests for excluded names.  
+ * @private */
 const NAME_PATTERN = /[a-zA-Z_$][0-9a-zA-Z_$]*/;
 
 /** This function validates a table name. It returns 
