@@ -215,21 +215,23 @@ export default class CodeableMember extends DependentMember {
             //--------------------------------------
             else {            
                 //this is an error in the code
+                console.error("Error calculating member " + this.getFullName(model));
                 if(error.stack) {
-                    console.error("Error calculating member " + this.getFullName(model));
                     console.error(error.stack);
                 }
 
-                //create the extended error info
-                CodeableMember.storeMemberTraceInfo(model,error,this);
+                //create the extended error info - but only if this is an error object
+                if(error instanceof Error) {
+                    CodeableMember.storeMemberTraceInfo(model,error,this);
 
-                let errorInfo = {};
-                errorInfo.type = "runtimeError";
-                errorInfo.description = "Error in code evaluating member: " + this.getFullName(model);
-                if(error.stack) errorInfo.stack = error.stack;
-                errorInfo.memberTrace = CodeableMember.recallMemberTraceInfo(error);
+                    let errorInfo = {};
+                    errorInfo.type = "runtimeError";
+                    errorInfo.description = "Error in code evaluating member: " + this.getFullName(model);
+                    if(error.stack) errorInfo.stack = error.stack;
+                    errorInfo.memberTrace = CodeableMember.recallMemberTraceInfo(error);
 
-                apogeeutil.appendErrorInfo(error,errorInfo);
+                    apogeeutil.appendErrorInfo(error,errorInfo);
+                }
 
                 this.setError(model,error);
             }
@@ -473,6 +475,9 @@ export default class CodeableMember extends DependentMember {
 
     /** This method is used to add trace of members whose code was called */
     static storeMemberTraceInfo(model,error,member) {
+        //only store member trace on an error object
+        if(!(error instanceof Error)) return;
+
         if(!error.memberTrace) {
             error.memberTrace = [];
         }
