@@ -36,8 +36,10 @@ export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCo
     }
 
     HardcodedJsonTable.generator = {};
-    Object.assign(HardcodedJsonTable.generator,JsonTable.generator);
     HardcodedJsonTable.generator.type = typeName;
+    HardcodedJsonTable.generator.createMember = HardcodedJsonTable.fromJson;
+    HardcodedJsonTable.generator.setDataOk = true;
+    HardcodedJsonTable.generator.setCodeOk = false;
 
     //register this member
     Model.addMemberGenerator(HardcodedJsonTable.generator);

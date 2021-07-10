@@ -17,7 +17,20 @@ export default class NoSaveJsonTable extends JsonTable {
         return undefined;
     }
 
+    /** This method creates a member from a json. It should be implemented as a static
+     * method in a non-abstract class. */ 
+     static fromJson(model,json) {
+        let member = new NoSaveJsonTable(json.name,null,null,json.specialIdValue);
+
+        //get a copy of the initial data and set defaults if needed
+        //NEED TO LOAD DEFAULT VALUE FROM JSON!!!
+
+        return member;
+    }
+
 }
+
+const DEFAULT_DEFAULT_VALUE = apogeeutil.INVALID_DATA;
 
 //============================
 // Static methods
@@ -26,6 +39,10 @@ export default class NoSaveJsonTable extends JsonTable {
 NoSaveJsonTable.generator = {};
 Object.assign(NoSaveJsonTable.generator,JsonTable.generator);
 NoSaveJsonTable.generator.type = "apogee.NoSaveJsonMember";
+NoSaveJsonTable.generator.createMember = NoSaveJsonTable.fromJson;
+NoSaveJsonTable.generator.setDataOk = true;
+NoSaveJsonTable.generator.setCodeOk = false;
+
 
 
 //register this member
