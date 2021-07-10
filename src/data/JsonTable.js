@@ -77,7 +77,7 @@ export default class JsonTable extends CodeableMember {
             (!initialData.error) && //no error (any error will set the error state)
             (!initialData.errorList) && //DEPRECATED! no error list (any error list will set the error state)
             (initialData.invalidValue !== true) //not invalid value
-        ) initialData.data = "";
+        ) initialData.data = member.getDefaultDataValue();
 
         member.setUpdateData(model,initialData);
 

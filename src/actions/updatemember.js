@@ -55,15 +55,28 @@ function updateCode(model,actionData) {
         return actionResult;
     }
           
-    member.applyCode(actionData.argList,
-        actionData.functionBody,
-        actionData.supplementalCode);
-        
-    actionResult.actionDone = true;
-    actionResult.updateMemberDependencies = true;
-    actionResult.recalculateMember = true;
+    //clear code case - function body and supplemental code are falsey - empty string (or null or undefined, which is not supposed to happen)
+    //in this case, if the member has a default data value and data is settable, set the default value
+    if((!actionData.functionBody)&&(!actionData.supplementalCode)&&(member.getDefaultDataValue)&&(member.getSetDataOk())) {
+        //pass this to the update data function
+        let modActionData = {
+            action: "updateData",
+            memberId: actionData.memberId,
+            data: member.getDefaultDataValue()
+        }
+        return updateData(model,modActionData);
+    }
+    else {
+        member.applyCode(actionData.argList,
+            actionData.functionBody,
+            actionData.supplementalCode);
+            
+        actionResult.actionDone = true;
+        actionResult.updateMemberDependencies = true;
+        actionResult.recalculateMember = true;
 
-    return actionResult;
+        return actionResult;
+    }
 }
 
 /** Update data action function. */
