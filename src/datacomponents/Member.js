@@ -301,6 +301,12 @@ export default class Member extends FieldObject {
             model.doFutureAction(actionData);
         }
         var asynchErrorCallback = error => {
+
+            //this must be an error object to be handled properly
+            if(!(error instanceof Error)) {
+                error = new Error(error.toString());
+            }
+
             let actionData = {};
             actionData.action = "updateData";
             actionData.memberId = this.getId();
