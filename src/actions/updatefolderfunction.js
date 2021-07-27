@@ -8,7 +8,7 @@ import {addActionInfo} from "/apogeejs-model-lib/src/actions/action.js";
  *  "action": "updateFolderFunction",
  *  "member": (member to move),
  *  "argList": (argument list, as an array of strings)
- *  "returnValueString": (name of the return value table)
+ *  "returnValue": (name of the return value table)
  *  
  *  "eventInfo": (OUTPUT - event info for the associated delete event)
  * }
@@ -29,7 +29,7 @@ function updateProperties(model,actionData) {
     actionResult.member = folderFunction;
     
     folderFunction.setArgList(actionData.argList);
-    folderFunction.setReturnValueString(actionData.returnValueString);
+    folderFunction.setReturnValueString(actionData.returnValue);
     
     actionResult.actionDone = true;
     actionResult.recalculateMember = true;

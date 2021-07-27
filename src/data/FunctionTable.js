@@ -133,10 +133,8 @@ export default class FunctionTable extends CodeableMember {
 
     /** This method extends the base method to get the property values
      * for the property editting. */
-    static readProperties(member,values) {
-        var argList = member.getArgList();
-        var argListString = argList.toString();
-        values.argListString = argListString;
+    static writeProperties(member,values) {
+        values.argList = member.getArgList();
         return values;
     }
 
@@ -165,7 +163,7 @@ export default class FunctionTable extends CodeableMember {
 FunctionTable.generator = {};
 FunctionTable.generator.type = "apogee.FunctionMember";
 FunctionTable.generator.createMember = FunctionTable.fromJson;
-FunctionTable.generator.readProperties = FunctionTable.readProperties;
+FunctionTable.generator.writeProperties = FunctionTable.writeProperties;
 FunctionTable.generator.getPropertyUpdateAction = FunctionTable.getPropertyUpdateAction;
 FunctionTable.generator.setDataOk = false;
 FunctionTable.generator.setCodeOk = true;

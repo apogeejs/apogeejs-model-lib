@@ -83,13 +83,10 @@ export default class FolderFunction extends DependentMember {
         }
     }
 
-    /** This method extends the base method to get the property values
-     * for the property editting. */
-    static readProperties(member,values) {
-        var argList = member.getArgList();
-        var argListString = argList.toString();
-        values.argListString = argListString;
-        values.returnValueString = member.getReturnValueString();
+    /** This method writes the property values into the passed "values" json. */
+    static writeProperties(member,values) {
+        values.argList = member.getArgList();
+        values.returnValue = member.getReturnValueString();
         return values;
     }
 
@@ -105,7 +102,7 @@ export default class FolderFunction extends DependentMember {
             actionData.action = "updateFolderFunction";
             actionData.memberId = folderFunction.getId();
             actionData.argList = argList;
-            actionData.returnValueString = returnValueString;
+            actionData.returnValue = returnValueString;
             return actionData;
         }    
         else {
@@ -410,7 +407,7 @@ FolderFunction.INTERNAL_FOLDER_NAME = "body";
 FolderFunction.generator = {};
 FolderFunction.generator.type = "apogee.FolderFunction";
 FolderFunction.generator.createMember = FolderFunction.fromJson;
-FolderFunction.generator.readProperties = FolderFunction.readProperties;
+FolderFunction.generator.writeProperties = FolderFunction.writeProperties;
 FolderFunction.generator.getPropertyUpdateAction = FolderFunction.getPropertyUpdateAction;
 FolderFunction.generator.setDataOk = false;
 FolderFunction.generator.setCodeOk = false;
