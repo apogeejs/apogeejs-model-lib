@@ -84,23 +84,23 @@ export default class FolderFunction extends DependentMember {
     }
 
     /** This method writes the property values into the passed "values" json. */
-    static writeProperties(member,values) {
-        values.argList = member.getArgList();
-        values.returnValue = member.getReturnValueString();
+    writeProperties(values) {
+        values.argList = this.getArgList();
+        values.returnValue = this.getReturnValueString();
         return values;
     }
 
-    /** This method executes a property update. */
-    static getPropertyUpdateAction(folderFunction,newValues) {
+    /** This is used for parents for creating the action for a local property update. (parent method, for a member function) */
+    getLocalPropertyUpdateAction(model,newValues) {
         let updateData = newValues.updateData;
         if((updateData)&&((updateData.argList !== undefined)||(updateData.returnValue !== undefined))) {
 
-            var argList = updateData.argList ? updateData.argList : folderFunction.getArgList();
-            var returnValueString = updateData.returnValue ? updateData.returnValue : folderFunction.getReturnValueString();
+            var argList = updateData.argList ? updateData.argList : this.getArgList();
+            var returnValueString = updateData.returnValue ? updateData.returnValue : this.getReturnValueString();
     
             var actionData = {};
             actionData.action = "updateFolderFunction";
-            actionData.memberId = folderFunction.getId();
+            actionData.memberId = this.getId();
             actionData.argList = argList;
             actionData.returnValue = returnValueString;
             return actionData;
@@ -407,8 +407,6 @@ FolderFunction.INTERNAL_FOLDER_NAME = "body";
 FolderFunction.generator = {};
 FolderFunction.generator.type = "apogee.FolderFunction";
 FolderFunction.generator.createMember = FolderFunction.fromJson;
-FolderFunction.generator.writeProperties = FolderFunction.writeProperties;
-FolderFunction.generator.getPropertyUpdateAction = FolderFunction.getPropertyUpdateAction;
 FolderFunction.generator.setDataOk = false;
 FolderFunction.generator.setCodeOk = false;
 

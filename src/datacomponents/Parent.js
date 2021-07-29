@@ -185,3 +185,37 @@ Parent.lookupChildFromPathArray = function(model,path,startElement,optionalParen
         return childMember;
     }
 }
+
+//Parent.getLocalPropertyUpdateAction = function(member,newValues)
+
+/** This method gets the action to update the property. */
+Parent.getPropertyUpdateAction = function(model,newValues) {
+    let actionList = [];
+    if(this.getLocalPropertyUpdateAction) {
+        let localAction = this.getLocalPropertyUpdateAction(newValues);
+        if(localAction) {
+            actionList.push(localAction);
+        }
+    }
+
+    if(memberJson.children) {
+        for(let childName in memberJson.children) {
+            let childPropertyJson = memberJson.children[childName];
+            let childMember = lookupChild(model,childName);
+            let childAction = childMember.getPropertyUpdateAction(model,childPropertyJson)
+            actionList.push(childAction);
+        }
+    }
+
+    if(actionList.length > 1) {
+        let compoundAction = {};
+        compoundAction.type = "compoundAction";
+        compountAction.actions = actionList;
+    }
+    else if(actionList.length == 1) {
+        return actionList[0];
+    }
+    else {
+        return null;
+    }
+}

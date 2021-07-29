@@ -231,6 +231,9 @@ export default class Folder extends DependentMember {
 
 }
 
+
+
+
 //add components to this class                     
 apogeeutil.mixin(Folder,ContextHolder);
 apogeeutil.mixin(Folder,Parent);

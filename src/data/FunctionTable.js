@@ -133,20 +133,20 @@ export default class FunctionTable extends CodeableMember {
 
     /** This method extends the base method to get the property values
      * for the property editting. */
-    static writeProperties(member,values) {
-        values.argList = member.getArgList();
+    writeProperties(values) {
+        values.argList = this.getArgList();
         return values;
     }
 
     /** This method executes a property update. */
-    static getPropertyUpdateAction(member,newValues) {
+    getPropertyUpdateAction(model,newValues) {
         if((newValues.updateData)&&(newValues.updateData.argList !== undefined)) {
             var actionData = {};
             actionData.action = "updateCode";
-            actionData.memberId = member.getId();
+            actionData.memberId = this.getId();
             actionData.argList = newValues.updateData.argList;
-            actionData.functionBody = member.getFunctionBody();
-            actionData.supplementalCode = member.getSupplementalCode();
+            actionData.functionBody = this.getFunctionBody();
+            actionData.supplementalCode = this.getSupplementalCode();
             return actionData;
         }
         else {
@@ -163,8 +163,6 @@ export default class FunctionTable extends CodeableMember {
 FunctionTable.generator = {};
 FunctionTable.generator.type = "apogee.FunctionMember";
 FunctionTable.generator.createMember = FunctionTable.fromJson;
-FunctionTable.generator.writeProperties = FunctionTable.writeProperties;
-FunctionTable.generator.getPropertyUpdateAction = FunctionTable.getPropertyUpdateAction;
 FunctionTable.generator.setDataOk = false;
 FunctionTable.generator.setCodeOk = true;
 
