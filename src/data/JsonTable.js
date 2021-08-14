@@ -68,7 +68,7 @@ export default class JsonTable extends CodeableMember {
 
         //get a copy of the initial data and set defaults if needed
         let initialData = {};
-        Object.assign(initialData,json.updateData);
+        Object.assign(initialData,json.fields);
 
         //if no value is set, set to an empty string
         if(

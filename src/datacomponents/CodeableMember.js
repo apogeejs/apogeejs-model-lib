@@ -247,11 +247,11 @@ export default class CodeableMember extends DependentMember {
     /** This gets an update structure to update a newly instantiated member
     /* to match the current object. */
     getUpdateData() {
-        var updateData = {};
+        var fields = {};
         if(this.hasCode()) {
-            updateData.argList = this.getArgList();
-            updateData.functionBody = this.getFunctionBody();
-            updateData.supplementalCode = this.getSupplementalCode();
+            fields.argList = this.getArgList();
+            fields.functionBody = this.getFunctionBody();
+            fields.supplementalCode = this.getSupplementalCode();
         }
         else {
             let state = this.getState();
@@ -259,36 +259,36 @@ export default class CodeableMember extends DependentMember {
             //handle the possible data value cases
             if(state == apogeeutil.STATE_INVALID) {
                 //invalid valude
-                updateData.invalidValue = true;
+                fields.invalidValue = true;
             }
             else if(state == apogeeutil.STATE_PENDING) {
                 //pending value - we can't do anything with this
                 apogeeUserAlert("There is a pending result in a field being saved. This may not be saved properly.");
-                updateData.data = "<unknown pending value>";
+                fields.data = "<unknown pending value>";
             }
             else if(state == apogeeutil.STATE_ERROR) {
                 //save the error - this is a non-code/explicitly set error
                 let error = this.getError();
                 if(error) {
-                    updateData.error = error.toString();
-                    if(error.errorInfoList !== undefined) updateData.errorInfoList = error.errorInfoList;
-                    if(error.valueData !== undefined) updateData.errorValueData = error.valueData;
+                    fields.error = error.toString();
+                    if(error.errorInfoList !== undefined) fields.errorInfoList = error.errorInfoList;
+                    if(error.valueData !== undefined) fields.errorValueData = error.valueData;
                 }
                 else {
-                    updateData.error = "Unknown Error"; //unknonwn error
+                    fields.error = "Unknown Error"; //unknonwn error
                 }
             }
             else {
                 //save the data value
-                updateData.data = this.getData();
+                fields.data = this.getData();
             }
         }
 
         if(this.contextParentGeneration) {
-            updateData.contextParentGeneration = this.contextParentGeneration;
+            fields.contextParentGeneration = this.contextParentGeneration;
         }
 
-        return updateData;
+        return fields;
     }
 
     /** This member initialized the codeable fields for a member. */

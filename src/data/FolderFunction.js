@@ -57,7 +57,7 @@ export default class FolderFunction extends DependentMember {
         //set to an empty function
         member.setData(model,function(){});
 
-        let initialData = json.updateData;
+        let initialData = json.fields;
         let argList = ((initialData)&&(initialData.argList !== undefined)) ? initialData.argList : [];
         member.setField("argList",argList);
         let returnValueString = ((initialData)&&(initialData.returnValue !== undefined)) ? initialData.returnValue : [];
@@ -69,9 +69,9 @@ export default class FolderFunction extends DependentMember {
     /** This method adds any additional data to the json saved for this member. 
      * @protected */
     addToJson(model,json) {
-        json.updateData = {};
-        json.updateData.argList = this.getField("argList");
-        json.updateData.returnValue = this.getField("returnValue");
+        json.fields = {};
+        json.fields.argList = this.getField("argList");
+        json.fields.returnValue = this.getField("returnValue");
         json.children = {};
         let childIdMap = this.getChildIdMap();
         for(var name in childIdMap) {
@@ -92,11 +92,11 @@ export default class FolderFunction extends DependentMember {
 
     /** This is used for parents for creating the action for a local property update. (parent method, for a member function) */
     getLocalPropertyUpdateAction(model,newValues) {
-        let updateData = newValues.updateData;
-        if((updateData)&&((updateData.argList !== undefined)||(updateData.returnValue !== undefined))) {
+        let fields = newValues.fields;
+        if((fields)&&((fields.argList !== undefined)||(fields.returnValue !== undefined))) {
 
-            var argList = updateData.argList ? updateData.argList : this.getArgList();
-            var returnValueString = updateData.returnValue ? updateData.returnValue : this.getReturnValueString();
+            var argList = fields.argList ? fields.argList : this.getArgList();
+            var returnValueString = fields.returnValue ? fields.returnValue : this.getReturnValueString();
     
             var actionData = {};
             actionData.action = "updateFolderFunction";

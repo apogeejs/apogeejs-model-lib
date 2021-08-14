@@ -120,7 +120,7 @@ export default class FunctionTable extends CodeableMember {
 
         //get a copy of the initial data and set defaults if needed
         let initialData = {};
-        Object.assign(initialData,json.updateData);
+        Object.assign(initialData,json.fields);
 
         if(!initialData.argList) initialData.argList = [];
         if(!initialData.functionBody) initialData.functionBody = "";
@@ -140,11 +140,11 @@ export default class FunctionTable extends CodeableMember {
 
     /** This method executes a property update. */
     getPropertyUpdateAction(model,newValues) {
-        if((newValues.updateData)&&(newValues.updateData.argList !== undefined)) {
+        if((newValues.fields)&&(newValues.fields.argList !== undefined)) {
             var actionData = {};
             actionData.action = "updateCode";
             actionData.memberId = this.getId();
-            actionData.argList = newValues.updateData.argList;
+            actionData.argList = newValues.fields.argList;
             actionData.functionBody = this.getFunctionBody();
             actionData.supplementalCode = this.getSupplementalCode();
             return actionData;

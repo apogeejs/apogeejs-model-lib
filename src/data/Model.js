@@ -543,7 +543,7 @@ Model.ROOT_FOLDER_NAME = "main";
 Model.SAVE_FILE_TYPE = "apogee model";
 
 /** This is the supported file version. */
-Model.SAVE_FILE_VERSION = 0.3;
+Model.SAVE_FILE_VERSION = "1.0";
 
 Model.CONSECUTIVE_ACTION_INITIAL_LIMIT = 500;
 
