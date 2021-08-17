@@ -186,13 +186,13 @@ Parent.lookupChildFromPathArray = function(model,path,startElement,optionalParen
     }
 }
 
-//Parent.getLocalPropertyUpdateAction = function(member,newValues)
+//Parent.getLocalPropertyUpdateAction = function(model,newValues)
 
 /** This method gets the action to update the property. */
 Parent.getPropertyUpdateAction = function(model,propertyJson) {
     let actionList = [];
     if(this.getLocalPropertyUpdateAction) {
-        let localAction = this.getLocalPropertyUpdateAction(propertyJson);
+        let localAction = this.getLocalPropertyUpdateAction(model,propertyJson);
         if(localAction) {
             actionList.push(localAction);
         }
