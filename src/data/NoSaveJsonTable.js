@@ -4,10 +4,6 @@ import JsonTable from "/apogeejs-model-lib/src/data/JsonTable.js";
 /** This is an extension of the JsonTable which does not save the data. */
 export default class NoSaveJsonTable extends JsonTable {
 
-    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
-    }
-
     //------------------------------
     // Codeable Methods
     //------------------------------
@@ -20,7 +16,7 @@ export default class NoSaveJsonTable extends JsonTable {
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
      static fromJson(model,json) {
-        let member = new NoSaveJsonTable(json.name,null,null,json.specialIdValue);
+        let member = new NoSaveJsonTable(json.name,null,null,json.specialCaseIdValue);
 
         //get a copy of the initial data and set defaults if needed
         //NEED TO LOAD DEFAULT VALUE FROM JSON!!!

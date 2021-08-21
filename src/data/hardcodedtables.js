@@ -9,8 +9,8 @@ export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCo
 
     class HardcodedJsonTable extends JsonTable {
 
-        constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-            super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+        constructor(name,instanceToCopy,specialCaseIdValue) {
+            super(name,instanceToCopy,specialCaseIdValue);
         }
 
         /** This overrides the get update data method so there is not saved data. */
@@ -20,7 +20,7 @@ export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCo
         
         /** This method makes the instance using the hardocded data rather than saved data. */
         static fromJson(model,json) {
-            let member = new HardcodedJsonTable(json.name,null,null,json.specialIdValue);
+            let member = new HardcodedJsonTable(json.name,null,null,json.specialCaseIdValue);
 
             //set the initial data to the hardcoded code value
             let initialData = {
@@ -51,10 +51,6 @@ export function defineHardcodedFunctionTable(typeName,argListArray,functionBody,
 
     class HardcodedFunctionTable extends FunctionTable {
 
-        constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-            super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
-        }
-
         /** This overrides the get update data method so there is not saved data. */
         getUpdateData() {
             return undefined;
@@ -62,7 +58,7 @@ export function defineHardcodedFunctionTable(typeName,argListArray,functionBody,
         
         /** This method makes the instance using the hardocded data rather than saved data. */
         static fromJson(model,json) {
-            let member = new HardcodedJsonTable(json.name,null,null,json.specialIdValue);
+            let member = new HardcodedJsonTable(json.name,null,null,json.specialCaseIdValue);
 
             //set the initial data to the hardcoded code value
             let initialData = {

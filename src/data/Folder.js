@@ -8,8 +8,8 @@ import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
 /** This is a folder. */
 export default class Folder extends DependentMember {
 
-    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+    constructor(name,instanceToCopy,specialCaseIdValue) {
+        super(name,instanceToCopy,specialCaseIdValue);
 
         //mixin init where needed
         //This is not a root. Scope is inherited from the parent.
@@ -146,7 +146,7 @@ export default class Folder extends DependentMember {
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
     static fromJson(model,json) {
-        var folder = new Folder(json.name,null,null,json.specialIdValue);
+        var folder = new Folder(json.name,null,null,json.specialCaseIdValue);
 
         let dataMap = {};
         Object.freeze(dataMap);

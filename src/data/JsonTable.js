@@ -8,10 +8,6 @@ import CodeableMember from "/apogeejs-model-lib/src/datacomponents/CodeableMembe
 */
 export default class JsonTable extends CodeableMember {
 
-    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
-    }
-
     //------------------------------
     // Codeable Methods
     //------------------------------
@@ -64,7 +60,7 @@ export default class JsonTable extends CodeableMember {
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
     static fromJson(model,json) {
-        let member = new JsonTable(json.name,null,null,json.specialIdValue);
+        let member = new JsonTable(json.name,null,null,json.specialCaseIdValue);
 
         //get a copy of the initial data and set defaults if needed
         let initialData = {};

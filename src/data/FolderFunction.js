@@ -10,8 +10,8 @@ import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
  * that is expanded into data objects. */
 export default class FolderFunction extends DependentMember {
 
-    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+    constructor(name,instanceToCopy,specialCaseIdValue) {
+        super(name,instanceToCopy,specialCaseIdValue);
 
         //mixin init where needed
         this.contextHolderMixinInit();
@@ -50,7 +50,7 @@ export default class FolderFunction extends DependentMember {
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
     static fromJson(model,json) {
-        let member = new FolderFunction(json.name,null,null,json.specialIdValue);
+        let member = new FolderFunction(json.name,null,null,json.specialCaseIdValue);
 
         //set initial data
 

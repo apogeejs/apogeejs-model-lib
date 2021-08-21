@@ -13,8 +13,8 @@ import Member from "/apogeejs-model-lib/src/datacomponents/Member.js";
 export default class DependentMember extends Member {
 
     /** This initializes the component */
-    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+    constructor(name,instanceToCopy,specialCaseIdValue) {
+        super(name,instanceToCopy,specialCaseIdValue);
 
         //==============
         //Fields

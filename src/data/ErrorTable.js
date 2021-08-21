@@ -6,10 +6,6 @@ import Member from "/apogeejs-model-lib/src/datacomponents/Member.js";
  * is intended to be used as a placeholder when a table generator is not found. */
 export default class ErrorTable extends Member {
 
-    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);    
-    }
-
     //------------------------------
     // Member Methods
     //------------------------------
@@ -35,13 +31,13 @@ export default class ErrorTable extends Member {
      * method in a non-abstract class. */ 
     static fromJson(model,json) {
         //note - we send in the complete JSON so we can return is on saving
-        let member = new ErrorTable(json.name,null,null,json.specialIdValue);
+        let member = new ErrorTable(json.name,null,null,json.specialCaseIdValue);
 
-        //this is a bit clumsy, but we don't want to save the "specialIdValue",
+        //this is a bit clumsy, but we don't want to save the "specialCaseIdValue",
         //so we delete it if it is present
         //in other tables, it is just not added when we save the object
         let cleanedJson = apogeeutil.jsonCopy(json);
-        if(cleanedJson.specialIdValue) delete cleanedJson.specialIdValue;
+        if(cleanedJson.specialCaseIdValue) delete cleanedJson.specialCaseIdValue;
 
         //set the initial data
         member.setData(model,"");

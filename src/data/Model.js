@@ -8,13 +8,12 @@ import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
  * -instanceToCopy - if the new instance should be a copy of an existing instance, this
  * argument should be populated. The copy will have the same field values but it will be unlocked 
  * and by default the update fields will be cleared. The event listeners are also cleared.
- * - keepUpdatedFixed - If this argument is set to true, the updated field values will be maintained.
  * */
 export default class Model extends FieldObject {
 
-    constructor(runContext,instanceToCopy,keepUpdatedFixed) {
+    constructor(runContext,instanceToCopy) {
         //base init
-        super("model",instanceToCopy,keepUpdatedFixed);
+        super("model",instanceToCopy);
 
         //mixin initialization
         this.eventManagerMixinInit();

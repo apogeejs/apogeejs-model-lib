@@ -23,15 +23,11 @@ import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMem
 export default class CodeableMember extends DependentMember {
 
     /** This initializes the component. argList is the arguments for the object function. */
-    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+    constructor(name,instanceToCopy,specialCaseIdValue) {
+        super(name,instanceToCopy,specialCaseIdValue);
 
         //mixin init where needed. This is not a scoep root. Parent scope is inherited in this object
         this.contextHolderMixinInit(false);
-        
-        //this should be set to true by any extending class that supresses the messenger
-        //see the supressMessenger function for details.
-        this.doSupressMessenger = false;
         
         //==============
         //Fields
@@ -350,17 +346,6 @@ export default class CodeableMember extends DependentMember {
     // Protected Functions
     //===================================
 
-    /** This method is used to remove access to the messenger from the formula for
-     * this member. This should be done if the data from the member includes user runnable
-     * code. The messenger should only be called in creating a data result for the member.
-     * (Specifically, calling the messenger is only valid while the member is being calculated.
-     * If it is called after that it will throw an error.) One place this supression is done is
-     * in a FunctionMember.
-     */
-    supressMessenger(doSupressMessenger) {
-        this.doSupressMessenger = doSupressMessenger;
-    }
-
     /** This function just returns the context manager for the code for this object. 
      * This is nominally the context manager for this object. However, There is an allowance
      * to use a replacement for the context manager as used in the code.
@@ -442,7 +427,7 @@ export default class CodeableMember extends DependentMember {
                 
                 //set the context
                 let compiledInfo = this.getField("compiledInfo");
-                let messenger = this.doSupressMessenger ? undefined : new Messenger(model,this);
+                let messenger = new Messenger(model,this);
                 compiledInfo.memberFunctionContextInitializer(model,this.getCodeContextManager(model),messenger);
                 
                 functionInitializedSuccess = true;

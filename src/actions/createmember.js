@@ -14,7 +14,7 @@ import Model from "/apogeejs-model-lib/src/data/Model.js";
  *      - name
  *      - unique table type name
  *      - additional table specific data
- *      - specialIdValue (this is only to be used in special cases, to set the ID of the created object)
+ *      - specialCaseIdValue (this is only to be used in special cases, to set the ID of the created object)
  *  
  * }
  *
@@ -88,8 +88,8 @@ export function createMember(model,parent,memberJson) {
     //commands to actions. A single command often creates a hierarchy of members, all of which we 
     //would want to "modify". 
     try {
-        if(!memberJson.specialIdValue) {
-            memberJson.specialIdValue = member.getId();
+        if(!memberJson.specialCaseIdValue) {
+            memberJson.specialCaseIdValue = member.getId();
         }
     }
     catch(error) {
