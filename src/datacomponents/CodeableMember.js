@@ -380,8 +380,6 @@ export default class CodeableMember extends DependentMember {
         return contextMember;
     }
 
-
-
     //===================================
     // Private Functions
     //===================================

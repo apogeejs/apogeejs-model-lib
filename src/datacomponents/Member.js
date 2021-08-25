@@ -440,7 +440,3 @@ export default class Member extends FieldObject {
         return dependsOnError;
     }
 }
-
-//add mixins to this class
-apogeeutil.mixin(Member,FieldObject);
-
