@@ -242,7 +242,7 @@ export default class CodeableMember extends DependentMember {
 
     /** This gets an update structure to update a newly instantiated member
     /* to match the current object. */
-    getUpdateData() {
+    getFieldsJsonData() {
         var fields = {};
         if(this.hasCode()) {
             fields.argList = this.getArgList();
@@ -288,7 +288,7 @@ export default class CodeableMember extends DependentMember {
     }
 
     /** This member initialized the codeable fields for a member. */
-    setUpdateData(model,initialData) {
+    loadFieldsFromJson(model,initialData) {
         //apply the initial data
         if(initialData.functionBody !== undefined) {
             //apply initial code

@@ -56,38 +56,33 @@ export default class JsonTable extends CodeableMember {
         //store the new object
         return super.setData(model,data);
     }
-
-    /** This method creates a member from a json. It should be implemented as a static
-     * method in a non-abstract class. */ 
-    static fromJson(model,json) {
-        let member = new JsonTable(json.name,null,null,json.specialCaseIdValue);
-
-        //get a copy of the initial data and set defaults if needed
-        let initialData = {};
-        Object.assign(initialData,json.fields);
-
-        //if no value is set, set to an empty string
-        if(
-            (!initialData.functionBody) && //no function body (anything falsy is an invalid function)
-            (initialData.data === undefined) && //no data value set
-            (!initialData.error) && //no error (any error will set the error state)
-            (!initialData.errorList) && //DEPRECATED! no error list (any error list will set the error state)
-            (initialData.invalidValue !== true) //not invalid value
-        ) initialData.data = member.getDefaultDataValue();
-
-        member.setUpdateData(model,initialData);
-
-        return member;
-    }
 }
 
-//============================
-// Static methods
-//============================
+/** This function creates a new instance */ 
+function createMember(model,json) {
+    let member = new JsonTable(json.name,null,json.specialCaseIdValue);
+
+    //get a copy of the initial data and set defaults if needed
+    let initialData = {};
+    Object.assign(initialData,json.fields);
+
+    //if no value is set, set to an empty string
+    if(
+        (!initialData.functionBody) && //no function body (anything falsy is an invalid function)
+        (initialData.data === undefined) && //no data value set
+        (!initialData.error) && //no error (any error will set the error state)
+        (!initialData.errorList) && //DEPRECATED! no error list (any error list will set the error state)
+        (initialData.invalidValue !== true) //not invalid value
+    ) initialData.data = member.getDefaultDataValue();
+
+    member.loadFieldsFromJson(model,initialData);
+
+    return member;
+}
 
 JsonTable.generator = {};
 JsonTable.generator.type = "apogee.JsonMember";
-JsonTable.generator.createMember = JsonTable.fromJson;
+JsonTable.generator.createMember = createMember;
 JsonTable.generator.setDataOk = true;
 JsonTable.generator.setCodeOk = true;
 

@@ -47,47 +47,18 @@ export default class FolderFunction extends DependentMember {
     // Member Methods
     //------------------------------
 
-    /** This method creates a member from a json. It should be implemented as a static
-     * method in a non-abstract class. */ 
-    static fromJson(model,json) {
-        let member = new FolderFunction(json.name,null,null,json.specialCaseIdValue);
+    getFieldsJsonData() {
+        let fields = {};
+        fields.argList = this.getField("argList");
+        fields.returnValue = this.getField("returnValue");
+        return fields;
+    }
 
-        //set initial data
-
-        //set to an empty function
-        member.setData(model,function(){});
-
-        let initialData = json.fields;
+    loadFieldsFromJson(model,initialData) {
         let argList = ((initialData)&&(initialData.argList !== undefined)) ? initialData.argList : [];
         member.setField("argList",argList);
         let returnValueString = ((initialData)&&(initialData.returnValue !== undefined)) ? initialData.returnValue : [];
         member.setField("returnValue",returnValueString);
-        
-        return member;
-    }
-
-    /** This method adds any additional data to the json saved for this member. 
-     * @protected */
-    addToJson(model,json) {
-        json.fields = {};
-        json.fields.argList = this.getField("argList");
-        json.fields.returnValue = this.getField("returnValue");
-        json.children = {};
-        let childIdMap = this.getChildIdMap();
-        for(var name in childIdMap) {
-            var childId = childIdMap[name];
-            let child = model.lookupMemberById(childId);
-            if(child) {
-                json.children[name] = child.toJson(model);
-            }
-        }
-    }
-
-    /** This method writes the property values into the passed "values" json. */
-    writeProperties(values) {
-        values.argList = this.getArgList();
-        values.returnValue = this.getReturnValueString();
-        return values;
     }
 
     /** This is used for parents for creating the action for a local property update. (parent method, for a member function) */
@@ -400,13 +371,22 @@ apogeeutil.mixin(FolderFunction,Parent);
 FolderFunction.INTERNAL_FOLDER_NAME = "body";
 
         
-//============================
-// Static methods
-//============================
+/** This function creates a new instance */ 
+function createMember(model,json) {
+    let member = new FolderFunction(json.name,null,json.specialCaseIdValue);
+
+    //set to an empty function
+    member.setData(model,function(){});
+
+    //set initial data
+    member.loadFieldsFromJson(json.fields);
+    
+    return member;
+}
 
 FolderFunction.generator = {};
 FolderFunction.generator.type = "apogee.FolderFunction";
-FolderFunction.generator.createMember = FolderFunction.fromJson;
+FolderFunction.generator.createMember = createMember;
 FolderFunction.generator.setDataOk = false;
 FolderFunction.generator.setCodeOk = false;
 

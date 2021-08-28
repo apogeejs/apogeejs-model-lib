@@ -105,31 +105,6 @@ export default class FunctionTable extends CodeableMember {
     // Member Methods
     //------------------------------
 
-    /** This method creates a member from a json. It should be implemented as a static
-     * method in a non-abstract class. */ 
-    static fromJson(model,json) {
-        let member = new FunctionTable(json.name,null,null,json.specialCaseIdValue);
-
-        //get a copy of the initial data and set defaults if needed
-        let initialData = {};
-        Object.assign(initialData,json.fields);
-
-        if(!initialData.argList) initialData.argList = [];
-        if(!initialData.functionBody) initialData.functionBody = "";
-        if(!initialData.supplementalCode) initialData.supplementalCode = "";
-
-        member.setUpdateData(model,initialData);
-
-        return member;
-    }
-
-    /** This method extends the base method to get the property values
-     * for the property editting. */
-    writeProperties(values) {
-        values.argList = this.getArgList();
-        return values;
-    }
-
     /** This method executes a property update. */
     getPropertyUpdateAction(model,newValues) {
         if((newValues.fields)&&(newValues.fields.argList !== undefined)) {
@@ -148,13 +123,26 @@ export default class FunctionTable extends CodeableMember {
 
 }
 
-//============================
-// Static methods
-//============================
+/** This function creates a new instance */ 
+function createMember(model,json) {
+    let member = new FunctionTable(json.name,null,json.specialCaseIdValue);
+
+    //get a copy of the initial data and set defaults if needed
+    let initialData = {};
+    Object.assign(initialData,json.fields);
+
+    if(!initialData.argList) initialData.argList = [];
+    if(!initialData.functionBody) initialData.functionBody = "";
+    if(!initialData.supplementalCode) initialData.supplementalCode = "";
+
+    member.loadFieldsFromJson(model,initialData);
+
+    return member;
+}
 
 FunctionTable.generator = {};
 FunctionTable.generator.type = "apogee.FunctionMember";
-FunctionTable.generator.createMember = FunctionTable.fromJson;
+FunctionTable.generator.createMember = createMember;
 FunctionTable.generator.setDataOk = false;
 FunctionTable.generator.setCodeOk = true;
 

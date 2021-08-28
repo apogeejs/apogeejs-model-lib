@@ -219,3 +219,20 @@ Parent.getPropertyUpdateAction = function(model,propertyJson) {
         return null;
     }
 }
+
+Parent.writeChildData = function(model,json) {
+    //BUT I DON'T WANT TO WRITE THIS IF IT IS ALWAYS NOT WRITEABLE
+    //MAYBE I NEED A FLAG TO SAY THIS IS SETTABLE???
+    if(!this.getChildrenWriteable()) {
+		json.childrenNotWriteable = true;
+	}
+
+    json.children = {};
+	
+	let childIdMap = this.getChildIdMap();
+	for(var name in childIdMap) {
+		let childId = childIdMap[name];
+		let child = model.lookupMemberById(childId);
+		json.children[name] = child.toJson(model);
+	}
+}

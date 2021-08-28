@@ -9,33 +9,27 @@ export default class NoSaveJsonTable extends JsonTable {
     //------------------------------
 
     /** This overrides the get update data method so there is not saved data. */
-    getUpdateData() {
+    getFieldsJsonData() {
         return undefined;
     }
-
-    /** This method creates a member from a json. It should be implemented as a static
-     * method in a non-abstract class. */ 
-     static fromJson(model,json) {
-        let member = new NoSaveJsonTable(json.name,null,null,json.specialCaseIdValue);
-
-        //get a copy of the initial data and set defaults if needed
-        //NEED TO LOAD DEFAULT VALUE FROM JSON!!!
-
-        return member;
-    }
-
 }
 
 const DEFAULT_DEFAULT_VALUE = apogeeutil.INVALID_DATA;
 
-//============================
-// Static methods
-//============================
+/** This function creates a new instance */ 
+function createMember(model,json) {
+    let member = new NoSaveJsonTable(json.name,null,null,json.specialCaseIdValue);
+
+    //get a copy of the initial data and set defaults if needed
+    //NEED TO LOAD DEFAULT VALUE FROM JSON!!!
+
+    return member;
+}
 
 NoSaveJsonTable.generator = {};
 Object.assign(NoSaveJsonTable.generator,JsonTable.generator);
 NoSaveJsonTable.generator.type = "apogee.NoSaveJsonMember";
-NoSaveJsonTable.generator.createMember = NoSaveJsonTable.fromJson;
+NoSaveJsonTable.generator.createMember = createMember;
 NoSaveJsonTable.generator.setDataOk = true;
 NoSaveJsonTable.generator.setCodeOk = false;
 

@@ -27,25 +27,6 @@ export default class ErrorTable extends Member {
         return this.getField("completeJson");
     }
 
-    /** This method creates a member from a json. It should be implemented as a static
-     * method in a non-abstract class. */ 
-    static fromJson(model,json) {
-        //note - we send in the complete JSON so we can return is on saving
-        let member = new ErrorTable(json.name,null,null,json.specialCaseIdValue);
-
-        //this is a bit clumsy, but we don't want to save the "specialCaseIdValue",
-        //so we delete it if it is present
-        //in other tables, it is just not added when we save the object
-        let cleanedJson = apogeeutil.jsonCopy(json);
-        if(cleanedJson.specialCaseIdValue) delete cleanedJson.specialCaseIdValue;
-
-        //set the initial data
-        member.setData(model,"");
-        member.setField("completeJson",cleanedJson);
-
-        return member;
-    }
-
     //------------------------------
     // Dependent Methods
     //------------------------------
@@ -64,13 +45,28 @@ export default class ErrorTable extends Member {
     }
 
 }
-//============================
-// Static methods
-//============================
+
+/** This function creates a new instance */ 
+function createMember(model,json) {
+    //note - we send in the complete JSON so we can return is on saving
+    let member = new ErrorTable(json.name,null,json.specialCaseIdValue);
+
+    //this is a bit clumsy, but we don't want to save the "specialCaseIdValue",
+    //so we delete it if it is present
+    //in other tables, it is just not added when we save the object
+    let cleanedJson = apogeeutil.jsonCopy(json);
+    if(cleanedJson.specialCaseIdValue) delete cleanedJson.specialCaseIdValue;
+
+    //set the initial data
+    member.setData(model,"");
+    member.setField("completeJson",cleanedJson);
+
+    return member;
+}
 
 ErrorTable.generator = {};
 ErrorTable.generator.type = "apogee.ErrorMember";
-ErrorTable.generator.createMember = ErrorTable.fromJson;
+ErrorTable.generator.createMember = createMember;
 ErrorTable.generator.setDataOk = false;
 
 //register this member

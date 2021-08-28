@@ -143,43 +143,6 @@ export default class Folder extends DependentMember {
     // Member Methods
     //------------------------------
 
-    /** This method creates a member from a json. It should be implemented as a static
-     * method in a non-abstract class. */ 
-    static fromJson(model,json) {
-        var folder = new Folder(json.name,null,null,json.specialCaseIdValue);
-
-        let dataMap = {};
-        Object.freeze(dataMap);
-        folder.setData(model,dataMap);
-
-        if(json.childrenNotWriteable) {
-            folder.setChildrenWriteable(false);
-        }
-
-        return folder;
-    }
-
-    /** This method adds any additional data to the json to save for this member. 
-     * @protected */
-    addToJson(model,json) {
-        json.children = {};
-        
-        if(!this.getChildrenWriteable()) {
-            json.childrenNotWriteable = true;
-        }
-        
-        let childIdMap = this.getChildIdMap();
-        for(var name in childIdMap) {
-            let childId = childIdMap[name];
-            let child = model.lookupMemberById(childId);
-            json.children[name] = child.toJson(model);
-        }
-    }
-
-    //------------------------------
-    // context holder Methods
-    //------------------------------
-
     /** This method retrieve creates the loaded context manager. */
     createContextManager() {
         //set the context manager
@@ -238,14 +201,25 @@ export default class Folder extends DependentMember {
 apogeeutil.mixin(Folder,ContextHolder);
 apogeeutil.mixin(Folder,Parent);
 
-//============================
-// Static methods
-//============================
+/** This function creates a new instance */ 
+function createMember(model,json) {
+    var folder = new Folder(json.name,null,json.specialCaseIdValue);
+
+    let dataMap = {};
+    Object.freeze(dataMap);
+    folder.setData(model,dataMap);
+
+    if(json.childrenNotWriteable) {
+        folder.setChildrenWriteable(false);
+    }
+
+    return folder;
+}
 
 
 Folder.generator = {};
 Folder.generator.type = "apogee.Folder";
-Folder.generator.createMember = Folder.fromJson;
+Folder.generator.createMember = createMember;
 Folder.generator.setDataOk = false;
 Folder.generator.setCodeOk = false;
 

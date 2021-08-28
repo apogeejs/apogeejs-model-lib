@@ -108,21 +108,16 @@ export default class Member extends FieldObject {
         var json = {};
         json.name = this.getField("name");
         json.type = this.constructor.generator.type;
-        if(this.addToJson) {
-            this.addToJson(model,json);
-        }
         
-        if(this.getUpdateData) {
-            json.fields = this.getUpdateData();
+        if(this.getFieldsJsonData) {
+            json.fields = this.getFieldsJsonData();
+        }
+
+        if((this.isParent)&&(this.saveChildData)) {
+            this.writeChildData(model,json);
         }
         return json;
     }
-
-    ///** This method creates a member from a json. IT should be implemented as a static
-    // * function in extending objects. */ 
-    //fromJson(parent,json,childrenJsonOutputList) {
-    //}
-
     //=======================================
     // Data/State getting functions
     //=======================================
@@ -400,21 +395,8 @@ export default class Member extends FieldObject {
     // * @protected */
     //onClose();
 
-    //Implement this method if there is data to add to this member. Otherwise it may
-    //be omitted
-    ///** This method adds any additional data to the json saved for this member. 
-    // * @protected */
-    //addToJson(model,json) {
-    //}
-
-    //Implement this method if there is update data for this json. otherwise it may
-    //be omitted
-    ///** This gets an update structure to upsate a newly instantiated member
-    //* to match the current object. It may return "undefined" if there is no update
-    //* data needed. 
-    //* @protected */
-    //getUpdateData() {
-    //}
+    //getFieldsJsonData
+    //loadFieldsFromJson
 
     //----------------------------------
     // Error methods
