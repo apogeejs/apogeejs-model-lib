@@ -67,7 +67,6 @@ function createMember(model,json) {
 ErrorTable.generator = {};
 ErrorTable.generator.type = "apogee.ErrorMember";
 ErrorTable.generator.createMember = createMember;
-ErrorTable.generator.setDataOk = false;
 
 //register this member
 Model.addMemberGenerator(ErrorTable.generator);

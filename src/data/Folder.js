@@ -14,7 +14,8 @@ export default class Folder extends DependentMember {
         //mixin init where needed
         //This is not a root. Scope is inherited from the parent.
         this.contextHolderMixinInit(false);
-        this.parentMixinInit(instanceToCopy);
+        let config = this.constructor.generator;
+        this.parentMixinInit(instanceToCopy,config.changeChildrenWriteable,config.defaultChildrenWriteable);
     }
 
     //------------------------------
@@ -209,9 +210,7 @@ function createMember(model,json) {
     Object.freeze(dataMap);
     folder.setData(model,dataMap);
 
-    if(json.childrenNotWriteable) {
-        folder.setChildrenWriteable(false);
-    }
+    folder.loadChildMetadata(json);
 
     return folder;
 }
@@ -220,8 +219,8 @@ function createMember(model,json) {
 Folder.generator = {};
 Folder.generator.type = "apogee.Folder";
 Folder.generator.createMember = createMember;
-Folder.generator.setDataOk = false;
-Folder.generator.setCodeOk = false;
+Folder.generator.changeChildrenWriteable = true;
+Folder.generator.defaultChildrenWriteable = true;
 
 //register this member
 Model.addMemberGenerator(Folder.generator);

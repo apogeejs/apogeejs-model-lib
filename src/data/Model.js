@@ -19,7 +19,7 @@ export default class Model extends FieldObject {
         this.eventManagerMixinInit();
         //this is a root for the context
         this.contextHolderMixinInit(true);
-        this.parentMixinInit(instanceToCopy);
+        this.parentMixinInit(instanceToCopy,CHANGE_CHILDREN_WRITEABLE,DEFAULT_CHILDREN_WRITEABLE);
 
         this.runContext = runContext;
 
@@ -532,6 +532,9 @@ export default class Model extends FieldObject {
 apogeeutil.mixin(Model,EventManager);
 apogeeutil.mixin(Model,ContextHolder);
 apogeeutil.mixin(Model,Parent);
+
+const CHANGE_CHILDREN_WRITEABLE = false;
+const DEFAULT_CHILDREN_WRITEABLE = true;
 
 let memberGenerators = {};
 

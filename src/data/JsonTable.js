@@ -75,7 +75,7 @@ function createMember(model,json) {
         (initialData.invalidValue !== true) //not invalid value
     ) initialData.data = member.getDefaultDataValue();
 
-    member.loadFieldsFromJson(model,initialData);
+    member.loadFieldsForCreate(model,initialData);
 
     return member;
 }

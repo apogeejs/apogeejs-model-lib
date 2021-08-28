@@ -110,10 +110,13 @@ export default class Member extends FieldObject {
         json.type = this.constructor.generator.type;
         
         if(this.getFieldsJsonData) {
-            json.fields = this.getFieldsJsonData();
+            let fields = this.getFieldsJsonData();
+            if(fields != undefined) {
+                json.fields = fields;
+            }
         }
 
-        if((this.isParent)&&(this.saveChildData)) {
+        if((this.isParent)&&(this.writeChildData)) {
             this.writeChildData(model,json);
         }
         return json;
@@ -138,11 +141,6 @@ export default class Member extends FieldObject {
     /** this method gets the data map. */
     getData() {
         return this.getField("data");
-    }
-
-    /** This returns true if this member accepts setting the data. */
-    getSetDataOk() {
-        return this.constructor.generator.setDataOk;
     }
 
     /** This returns the error object for this member. The entries can be javscript Error objects or other objects with a
@@ -396,7 +394,7 @@ export default class Member extends FieldObject {
     //onClose();
 
     //getFieldsJsonData
-    //loadFieldsFromJson
+    //loadFieldsForCreate
 
     //----------------------------------
     // Error methods

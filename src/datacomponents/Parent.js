@@ -13,13 +13,17 @@ export {Parent as default};
  * - isCopy - this should be set to true (or another value that evaluates to true) if this parent is being initialized
  * as a copy of aother instance.
  */
-Parent.parentMixinInit = function(isCopy) {
-    //default value. Can be reconfigured
-    this.childrenWriteable = true
+Parent.parentMixinInit = function(isCopy,changeChildrenWriteable,defaultChildrenWriteable) {
+    this.changeChildrenWriteable = changeChildrenWriteable;
+    this.defaultChildrenWriteable = defaultChildrenWriteable;
 
     if(!isCopy) {
-        //initialize the child mape
         this.setField("childIdMap",{});
+
+        //if we can set children writeable, store a field for this
+        if(changeChildrenWriteable) {
+            this.setField("childrenWriteable",this.defaultChildrenWriteable);
+        }
     }
 }
 
@@ -51,13 +55,20 @@ Parent.lookupChild = function(model,name) {
 /** This method allows the UI to decide if the user can add children to it. This
  * value defaults to true. */
 Parent.getChildrenWriteable = function() {
-    return this.childrenWriteable;
+    if(this.changeChildrenWriteable) {
+        return this.getField("childrenWriteable");
+    }
+    else {
+        return this.defaultChildrenWriteable;
+    }
 }
 
 /** This method sets the writeable property for adding child members. This value of
  * the method is not enforced (since children must be added one way or another). */
-Parent.setChildrenWriteable = function(writeable) {
-    this.childrenWriteable = writeable; 
+Parent.setChildrenWriteable = function(childrenWriteable) {
+    if(this.changeChildrenWriteable) {
+        this.setField("childrenWriteable",childrenWriteable ? true : false);
+    }
 }
 
 /** This method adds a table to the folder. It also sets the folder for the
@@ -220,12 +231,23 @@ Parent.getPropertyUpdateAction = function(model,propertyJson) {
     }
 }
 
+/** This method reads parent related data when loading from a JSON. It does not
+ * however read the children. This is done elsewhere. */
+Parent.loadChildMetadata = function(json) {
+    if((this.changeChildrenWriteable)&&(json.childrenNotWriteable !== undefined)) {
+        this.setChildrenWriteable(!json.childrenNotWriteable);
+    }
+}
+
+/** This mehod writes the child data for the parent, including the child objects themselves. */
 Parent.writeChildData = function(model,json) {
-    //BUT I DON'T WANT TO WRITE THIS IF IT IS ALWAYS NOT WRITEABLE
-    //MAYBE I NEED A FLAG TO SAY THIS IS SETTABLE???
-    if(!this.getChildrenWriteable()) {
-		json.childrenNotWriteable = true;
-	}
+    //save children writeable if it is not the default for this type
+    if(this.changeChildrenWriteable) {
+        let childrenWriteable = this.getChildrenWriteable();
+        if(this.defaultChildrenWriteable != childrenWriteable) {
+            json.childrenNotWriteable = !childrenWriteable;
+        }
+    }
 
     json.children = {};
 	

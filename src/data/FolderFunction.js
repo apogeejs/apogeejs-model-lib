@@ -15,7 +15,8 @@ export default class FolderFunction extends DependentMember {
 
         //mixin init where needed
         this.contextHolderMixinInit();
-        this.parentMixinInit(instanceToCopy);
+        let config = this.constructor.generator;
+        this.parentMixinInit(instanceToCopy,config.changeChildrenWriteable,config.defaultChildrenWriteable);
 
         //==============
         //Fields
@@ -54,7 +55,7 @@ export default class FolderFunction extends DependentMember {
         return fields;
     }
 
-    loadFieldsFromJson(model,initialData) {
+    loadFieldsForCreate(model,initialData) {
         let argList = ((initialData)&&(initialData.argList !== undefined)) ? initialData.argList : [];
         member.setField("argList",argList);
         let returnValueString = ((initialData)&&(initialData.returnValue !== undefined)) ? initialData.returnValue : [];
@@ -378,8 +379,11 @@ function createMember(model,json) {
     //set to an empty function
     member.setData(model,function(){});
 
-    //set initial data
-    member.loadFieldsFromJson(json.fields);
+    //load initial fields data
+    member.loadFieldsForCreate(json.fields);
+
+    //load parent/child data
+    member.loadChildMetadata(json);
     
     return member;
 }
@@ -387,8 +391,8 @@ function createMember(model,json) {
 FolderFunction.generator = {};
 FolderFunction.generator.type = "apogee.FolderFunction";
 FolderFunction.generator.createMember = createMember;
-FolderFunction.generator.setDataOk = false;
-FolderFunction.generator.setCodeOk = false;
+FolderFunction.generator.changeChildrenWriteable = false;
+FolderFunction.generator.defaultChildrenWriteable = false;
 
 //register this member
 Model.addMemberGenerator(FolderFunction.generator);

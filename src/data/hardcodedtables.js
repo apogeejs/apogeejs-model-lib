@@ -26,7 +26,7 @@ export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCo
             aupplementalCode: optionalPrivateCode ? optionalPrivateCode : ""
         }
 
-        member.loadFieldsFromJson(model,initialData);
+        member.loadFieldsForCreate(model,initialData);
 
         return member;
     }
@@ -64,7 +64,7 @@ export function defineHardcodedFunctionTable(typeName,argListArray,functionBody,
             aupplementalCode: optionalPrivateCode ? optionalPrivateCode : ""
         }
 
-        member.loadFieldsFromJson(model,initialData);
+        member.loadFieldsForCreate(model,initialData);
 
         return member;
     }

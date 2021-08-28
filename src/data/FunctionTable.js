@@ -135,7 +135,7 @@ function createMember(model,json) {
     if(!initialData.functionBody) initialData.functionBody = "";
     if(!initialData.supplementalCode) initialData.supplementalCode = "";
 
-    member.loadFieldsFromJson(model,initialData);
+    member.loadFieldsForCreate(model,initialData);
 
     return member;
 }

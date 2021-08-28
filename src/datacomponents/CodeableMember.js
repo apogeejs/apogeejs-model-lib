@@ -60,8 +60,17 @@ export default class CodeableMember extends DependentMember {
         return true;
     } 
 
+    /** This returns true if this member accepts setting the data. */
+    getSetDataOk() {
+        return this.constructor.generator.setDataOk;
+    }
+
     getSetCodeOk() {
         return this.constructor.generator.setCodeOk;
+    }
+
+    getNoSave() {
+        return this.constructor.generator.noSave;
     }
 
     /** This method returns the argument list.  */
@@ -243,6 +252,10 @@ export default class CodeableMember extends DependentMember {
     /** This gets an update structure to update a newly instantiated member
     /* to match the current object. */
     getFieldsJsonData() {
+        if(this.getNoSave()) {
+            return undefined;
+        }
+        
         var fields = {};
         if(this.hasCode()) {
             fields.argList = this.getArgList();
@@ -287,8 +300,9 @@ export default class CodeableMember extends DependentMember {
         return fields;
     }
 
-    /** This member initialized the codeable fields for a member. */
-    loadFieldsFromJson(model,initialData) {
+    /** This member initialized the codeable fields for a member. This should only be called during create. */
+    loadFieldsForCreate(model,initialData) {
+
         //apply the initial data
         if(initialData.functionBody !== undefined) {
             //apply initial code

@@ -1,5 +1,6 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import {addActionInfo} from "/apogeejs-model-lib/src/actions/action.js";
+import CodeableMember from "/apogeejs-model-lib/src/datacomponents/CodeableMember.js";
 
 /** This is self installing command module. It has no exports
  * but it must be imported to install the command. 
@@ -47,11 +48,12 @@ function updateCode(model,actionData) {
         actionResult.errorMsg = "Member not found for update member code";
         return actionResult;
     }
+
     actionResult.member = member;
 
-    if((!member.isCodeable)||(!member.getSetCodeOk())) {
+    if((!member instanceof CodeableMember)||(!member.getSetCodeOk())) {
         actionResult.actionDone = false;
-        actionResult.errorMsg = "can not set code on member: " + member.getFullName(model);
+        actionResult.errorMsg = "Can not set code on member: " + member.getFullName(model);
         return actionResult;
     }
           
@@ -109,7 +111,7 @@ function updateData(model,actionData) {
     }
     
     //check if we can set data (setting on a resolved promise is ok)
-    if((!resolvedPromise)&&(!member.getSetDataOk())) {
+    if((!resolvedPromise)&&((!member instanceof CodeableMember)||(!member.getSetDataOk()))) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Can not set data on member: " + member.getFullName(model);
         return actionResult;

@@ -44,6 +44,9 @@ function loadModel(model,actionData) {
         model.setName(modelJson.name);
     }
 
+    //get the parent/child metadata
+    model.loadChildMetadata(modelJson);
+
     //load the model members (root folder and its children)
     actionResult.childActionResults = [];
     for(let childName in modelJson.children) {
