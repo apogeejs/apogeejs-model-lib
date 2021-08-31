@@ -8,14 +8,14 @@ import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
 /** This is a folder. */
 export default class Folder extends DependentMember {
 
-    constructor(name,instanceToCopy,specialCaseIdValue) {
-        super(name,instanceToCopy,specialCaseIdValue);
+    constructor(name,instanceToCopy,typeConfig,specialCaseIdValue) {
+        super(name,instanceToCopy,typeConfig,specialCaseIdValue);
 
         //mixin init where needed
         //This is not a root. Scope is inherited from the parent.
         this.contextHolderMixinInit(false);
-        let config = this.constructor.generator;
-        this.parentMixinInit(instanceToCopy,config.changeChildrenWriteable,config.defaultChildrenWriteable);
+        let instanceTypeConfig = this.getTypeConfig();
+        this.parentMixinInit(instanceToCopy,instanceTypeConfig.changeChildrenWriteable,instanceTypeConfig.defaultChildrenWriteable);
     }
 
     //------------------------------
@@ -204,7 +204,7 @@ apogeeutil.mixin(Folder,Parent);
 
 /** This function creates a new instance */ 
 function createMember(model,json) {
-    var folder = new Folder(json.name,null,json.specialCaseIdValue);
+    var folder = new Folder(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
 
     let dataMap = {};
     Object.freeze(dataMap);
@@ -215,13 +215,12 @@ function createMember(model,json) {
     return folder;
 }
 
+const TYPE_CONFIG = {
+    type: "apogee.Folder",
+    createMember: createMember,
+    changeChildrenWriteable: true,
+    defaultChildrenWriteable: true
+}
 
-Folder.generator = {};
-Folder.generator.type = "apogee.Folder";
-Folder.generator.createMember = createMember;
-Folder.generator.changeChildrenWriteable = true;
-Folder.generator.defaultChildrenWriteable = true;
-
-//register this member
-Model.addMemberGenerator(Folder.generator);
+Model.registerTypeConfig(TYPE_CONFIG);
 

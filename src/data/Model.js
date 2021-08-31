@@ -512,18 +512,18 @@ export default class Model extends FieldObject {
     //================================
 
     /** This methods retrieves the member generator for the given type. */
-    static getMemberGenerator(type) {
-        return memberGenerators[type];
+    static getMemberTypeConfig(typeName) {
+        return memberTypeConfigs[typeName];
     }
 
     /** This method registers the member generator for a given named type. */
-    static addMemberGenerator(generator) {
-        memberGenerators[generator.type] = generator;
+    static registerTypeConfig(typeConfig) {
+        memberTypeConfigs[typeConfig.type] = typeConfig;
     }
 
     /** This method registers the member generator for a given named type. */
-    static removeMemberGenerator(type) {
-        delete memberGenerators[type];
+    static removeMemberTypeConfig(typeName) {
+        delete memberTypeConfigs[typeName];
     }
 
 }
@@ -536,7 +536,7 @@ apogeeutil.mixin(Model,Parent);
 const CHANGE_CHILDREN_WRITEABLE = false;
 const DEFAULT_CHILDREN_WRITEABLE = true;
 
-let memberGenerators = {};
+let memberTypeConfigs = {};
 
 Model.DEFAULT_MODEL_NAME = "Workspace";
 Model.ROOT_FOLDER_NAME = "main";

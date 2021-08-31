@@ -10,13 +10,13 @@ import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
  * that is expanded into data objects. */
 export default class FolderFunction extends DependentMember {
 
-    constructor(name,instanceToCopy,specialCaseIdValue) {
-        super(name,instanceToCopy,specialCaseIdValue);
+    constructor(name,instanceToCopy,typeConfig,specialCaseIdValue) {
+        super(name,instanceToCopy,typeConfig,specialCaseIdValue);
 
         //mixin init where needed
         this.contextHolderMixinInit();
-        let config = this.constructor.generator;
-        this.parentMixinInit(instanceToCopy,config.changeChildrenWriteable,config.defaultChildrenWriteable);
+        let instanceTypeConfig = this.getTypeConfig();
+        this.parentMixinInit(instanceToCopy,instanceTypeConfig.changeChildrenWriteable,instanceTypeConfig.defaultChildrenWriteable);
 
         //==============
         //Fields
@@ -374,7 +374,7 @@ FolderFunction.INTERNAL_FOLDER_NAME = "body";
         
 /** This function creates a new instance */ 
 function createMember(model,json) {
-    let member = new FolderFunction(json.name,null,json.specialCaseIdValue);
+    let member = new FolderFunction(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
 
     //set to an empty function
     member.setData(model,function(){});
@@ -388,14 +388,14 @@ function createMember(model,json) {
     return member;
 }
 
-FolderFunction.generator = {};
-FolderFunction.generator.type = "apogee.FolderFunction";
-FolderFunction.generator.createMember = createMember;
-FolderFunction.generator.changeChildrenWriteable = false;
-FolderFunction.generator.defaultChildrenWriteable = false;
+const TYPE_CONFIG = {
+    type: "apogee.FolderFunction",
+    createMember: createMember,
+    changeChildrenWriteable: false,
+    defaultChildrenWriteable: false
+}
 
-//register this member
-Model.addMemberGenerator(FolderFunction.generator);
+Model.registerTypeConfig(TYPE_CONFIG);
 
 
 //////////////////////////////////////////////////////////////////

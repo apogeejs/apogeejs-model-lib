@@ -4,6 +4,10 @@ import CodeableMember from "/apogeejs-model-lib/src/datacomponents/CodeableMembe
 
 /** This is a function. */
 export default class FunctionTable extends CodeableMember {
+
+    constructor(name,instanceToCopy,typeConfig,specialCaseIdValue) {
+        super(name,instanceToCopy,typeConfig,specialCaseIdValue,true/* setCodeOk */,false/* setDataOk */);
+    }
     
     //------------------------------
     // Codeable Methods
@@ -140,12 +144,10 @@ function createMember(model,json) {
     return member;
 }
 
-FunctionTable.generator = {};
-FunctionTable.generator.type = "apogee.FunctionMember";
-FunctionTable.generator.createMember = createMember;
-FunctionTable.generator.setDataOk = false;
-FunctionTable.generator.setCodeOk = true;
+const TYPE_CONFIG = {
+    type: "apogee.FunctionMember",
+    createMember: createMember
+}
 
-//register this member
-Model.addMemberGenerator(FunctionTable.generator);
+Model.registerTypeConfig(TYPE_CONFIG);
 

@@ -17,7 +17,7 @@ export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCo
 
     /** This function creates a new instance */ 
     let createMember = function(model,json) {
-        let member = new HardcodedJsonTable(json.name,null,null,json.specialCaseIdValue);
+        let member = new HardcodedJsonTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
 
         //set the initial data to the hardcoded code value
         let initialData = {
@@ -31,14 +31,12 @@ export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCo
         return member;
     }
 
-    HardcodedJsonTable.generator = {};
-    HardcodedJsonTable.generator.type = typeName;
-    HardcodedJsonTable.generator.createMember = createMember;
-    HardcodedJsonTable.generator.setDataOk = true;
-    HardcodedJsonTable.generator.setCodeOk = false;
-
-    //register this member
-    Model.addMemberGenerator(HardcodedJsonTable.generator);
+    const TYPE_CONFIG = {
+        type: typeName,
+        createMember: createMember
+    }
+    
+    Model.registerTypeConfig(TYPE_CONFIG);
 }
 
 /** This function defines a FunctionTable thatis hard coded. It is automatically added to
@@ -55,7 +53,7 @@ export function defineHardcodedFunctionTable(typeName,argListArray,functionBody,
 
     /** This function creates a new instance */ 
     let createMember = function(model,json) {
-        let member = new HardcodedJsonTable(json.name,null,null,json.specialCaseIdValue);
+        let member = new HardcodedJsonTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
 
         //set the initial data to the hardcoded code value
         let initialData = {
@@ -69,14 +67,14 @@ export function defineHardcodedFunctionTable(typeName,argListArray,functionBody,
         return member;
     }
 
-    HardcodedFunctionTable.generator = {};
-    HardcodedFunctionTable.generator.type = typeName;
-    HardcodedFunctionTable.generator.createMember = createMember;
-    HardcodedFunctionTable.generator.setDataOk = false;
-    HardcodedFunctionTable.generator.setCodeOk = false;
+    //DOH - I Should make this a constant.
 
-    //register this member
-    Model.addMemberGenerator(HardcodedFunctionTable.generator);
+    const TYPE_CONFIG = {
+        type: typeName,
+        createMember: createMember
+    }
+    
+    Model.registerTypeConfig(TYPE_CONFIG);
 }
 
 export function getSerializedHardcodedTable(instanceName,typeName) {

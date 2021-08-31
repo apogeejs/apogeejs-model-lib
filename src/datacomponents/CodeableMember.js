@@ -22,12 +22,17 @@ import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMem
  */
 export default class CodeableMember extends DependentMember {
 
-    /** This initializes the component. argList is the arguments for the object function. */
-    constructor(name,instanceToCopy,specialCaseIdValue) {
-        super(name,instanceToCopy,specialCaseIdValue);
+    /** This initializes the component. Added arguments over member:
+     * - setCodeOk - This type allows setting code
+     * - setDataOk - This type allows setting data
+     */
+    constructor(name,instanceToCopy,typeConfig,specialCaseIdValue,setCodeOk,setDataOk) {
+        super(name,instanceToCopy,typeConfig,specialCaseIdValue);
 
         //mixin init where needed. This is not a scoep root. Parent scope is inherited in this object
         this.contextHolderMixinInit(false);
+        this.setCodeOk = setCodeOk;
+        this.setDataOk = setDataOk;
         
         //==============
         //Fields
@@ -39,13 +44,7 @@ export default class CodeableMember extends DependentMember {
             //"functionBody";
             //"supplementalCode";
             //"compiledInfo"
-        }
-        else {
-            //this is treated as a fixed variable rather than a field
-            //it can be set only on creation
-            if(instanceToCopy.contextParentGeneration) {
-                this.contextParentGeneration = instanceToCopy.contextParentGeneration;
-            }
+            //and more...
         }
         
         //==============
@@ -59,19 +58,6 @@ export default class CodeableMember extends DependentMember {
     get isCodeable() {
         return true;
     } 
-
-    /** This returns true if this member accepts setting the data. */
-    getSetDataOk() {
-        return this.constructor.generator.setDataOk;
-    }
-
-    getSetCodeOk() {
-        return this.constructor.generator.setCodeOk;
-    }
-
-    getNoSave() {
-        return this.constructor.generator.noSave;
-    }
 
     /** This method returns the argument list.  */
     getArgList() {
@@ -245,6 +231,80 @@ export default class CodeableMember extends DependentMember {
         this.clearCalcPending();
     }
 
+    //----------------------------
+    // Codeable Settings Methods
+    //-----------------------------
+
+    
+    /** This returns true if this member accepts setting the data. */
+    getSetDataOk() {
+        return this.setDataOk;
+    }
+
+    getSetCodeOk() {
+        return this.setCodeOk;
+    }
+
+    getNoSave() {
+        if(this.getNoSaveChangeable()) {
+            return this.getField("noSave");
+        }
+        else return this.getDefaultNoSave();
+    }
+
+    getDefaultNoSave() {
+        let typeConfig = this.getTypeConfig();
+        if(typeConfig.defaultNoSave !== undefined) {
+            return typeConfig.defaultNoSave;
+        }
+        else {
+            return DEAFULT_NO_SAVE;
+        }
+    }
+
+    getNoSaveChangeable() {
+        let typeConfig = this.getTypeConfig();
+        if(typeConfig.noSaveChangeable !== undefined) {
+            return typeConfig.noSaveChangeable;
+        }
+        else {
+            return DEAFULT_NO_SAVE_CHANGEABLE;
+        }
+    }
+
+    getFieldsLocked() {
+        let typeConfig = this.getTypeConfig();
+        if(typeConfig.fieldsLockedChangeable !== undefined) {
+            return this.getField("fieldsLocked");
+        }
+        else {
+            return this.getDefaultFieldsLocked();
+        }
+    }
+
+    getDefaultFieldsLocked() {
+        let typeConfig = this.getTypeConfig();
+        if(typeConfig.defaultFieldsLocked !== undefined) {
+            return typeConfig.defaultFieldsLocked;
+        }
+        else {
+            return DEAFULT_FIELDS_LOCKED;
+        }
+    }
+
+    getFieldsLockedChangeable() {
+        let typeConfig = this.getTypeConfig();
+        if(typeConfig.fieldsLockedChangeable !== undefined) {
+            return typeConfig.fieldsLockedChangeable;
+        }
+        else {
+            return DEAFULT_FIELDS_LOCKED_CHANGEABLE;
+        }
+    }
+
+    //to set DEAFULT_NO_SAVE, DEAFULT_NO_SAVE_CHANGEABLE, DEAFULT_FIELDS_LOCKED, DEAFULT_FIELDS_LOCKED_CHANGEABLE
+
+
     //------------------------------
     // Member Methods
     //------------------------------
@@ -252,11 +312,56 @@ export default class CodeableMember extends DependentMember {
     /** This gets an update structure to update a newly instantiated member
     /* to match the current object. */
     getFieldsJsonData() {
-        if(this.getNoSave()) {
-            return undefined;
+        let fields = {};
+
+        //------------------
+        //settings
+        //------------------
+
+        //no save
+        let noSave = this.getNoSave();
+        let defaultNoSave = this.getDefaultNoSave();
+        if(noSave != defaultNoSave) {
+            //save the value of "noSave" only if it differs from default
+            fields.noSave = noSave;
+        }
+
+        //context parent generation
+        let contextParentGeneration = this.getField("contextParentGeneration");
+        if(contextParentGeneration) {
+            //save it if it is defined and not 0 (that is implicit default)
+            fields.contextParentGeneration = this.contextParentGeneration;
+        }
+
+        //fields locked
+        let fieldsLocked = this.getFieldsLocked();
+        let defaultFieldsLocked = this.getDefaultFieldsLocked();
+        if(fieldsLocked != defaultFieldsLocked) {
+            fields.fieldsLocked = fieldsLocked;
+        }
+
+        //-----------------
+        // data and function body fields
+        //-----------------
+
+        //save fields for no save case
+        if(noSave) {
+            if(this.getNoSaveChangeable()) {
+                //If no fields is changeable, we will store the "baseFields", which is the 
+                //stored value to use at initialization.
+                let baseFields = this.getField("baseFields");
+                if(baseFields) {
+                    Object.assign(fields,baseFields);
+                };
+                return fields;
+            }
+            else {
+                //if the noSave field is not changeble, save nothing. Default will be loaded on open.
+                return null;
+            }
         }
         
-        var fields = {};
+        //normal case
         if(this.hasCode()) {
             fields.argList = this.getArgList();
             fields.functionBody = this.getFunctionBody();
@@ -293,25 +398,46 @@ export default class CodeableMember extends DependentMember {
             }
         }
 
-        if(this.contextParentGeneration) {
-            fields.contextParentGeneration = this.contextParentGeneration;
-        }
-
         return fields;
     }
 
     /** This member initialized the codeable fields for a member. This should only be called during create. */
     loadFieldsForCreate(model,initialData) {
-
-        //apply the initial data
-        if(initialData.functionBody !== undefined) {
-            //apply initial code
-            this.applyCode(initialData.argList,
-                initialData.functionBody,
-                initialData.supplementalCode);
+        //handle the no save case
+        if(this.getNoSaveChangeable()) {
+            let noSave = (initialData.noSave !== undefined) ? initialData.noSave : this.getDefaultNoSave();
+            if(noSave) {
+                //only save the noSave flag if it is true. Save the base fields too.
+                this.setField("noSave",true);
+                this.setField("baseFields",initialData);
+            }
         }
-        else {
-            //set initial data
+        else if(this.getDefaultNoSave()) {
+            //if the noSave is not changeable (hardcoded) apply the default fields directly
+            initialData = this.getDefaultFields();
+        }
+
+        //read the locked settings, if they are settable
+        if(this.getFieldsLockedChangeable()) {
+            let fieldsLocked = (initialData.fieldLocked !== undefined) ? initialData.fieldLocked : this.getDefaultFieldsLocked();
+            this.setField("fieldsLocked",fieldsLocked);
+        }
+
+        //read context parent, defaults to none if not in initial data.
+        if(initialData.contextParentGeneration) {
+            this.setField("contextParentGeneration",initialData.contextParentGeneration);
+        }
+
+        //apply initial fields data/argList/functionBody/supplementalCode
+        if( ((initialData.functionBody !== undefined)||(!this.getSetDataOk())) && (this.getSetCodeOk())) {
+            //set code
+            let argList = (initialData.argList !== undefined) ? initialData.argList : this.getDefaultArgList();
+            let functionBody = (initialData.functionBody !== undefined) ? initialData.functionBody : this.getDefaultFunctionBody();
+            let supplementalCode = (initialData.supplementalCode !== undefined) ? initialData.supplementalCode : this.getDefaultSupplementalCode();
+            this.applyCode(argList,functionBody,supplementalCode);
+        }
+        else if(this.setDataOk()) {
+            //set data
             if(initialData.error) {
                 //reconstruct the error
                 let error = new Error(initialData.error);
@@ -323,27 +449,17 @@ export default class CodeableMember extends DependentMember {
                 }
                 this.setError(model,error);
             }
-            else if(initialData.errorList) {
-                //depracated!!! replaced with initialData.error and initialData.errorInfoList
-                //this feature was seldom if ever used, so we will just take the first if there is more than one
-                let error = (errorList.length >= 1) ? errorList[0] : new Error("Error!");
-                this.setError(model,error);
-            }
             else if(initialData.invalidValue) {
                 this.setResultInvalid(model);
             }
             else {
-                let data = (initialData.data !== undefined) ? initialData.data : "";
+                let data = (initialData.data !== undefined) ? initialData.data : this.getDefaultData();
                 this.setData(model,data);
             }
 
             //set the code fields to empty strings
             this.setField("functionBody","");
             this.setField("supplementalCode","");
-        }
-
-        if(initialData.contextParentGeneration) {
-            this.contextParentGeneration = initialData.contextParentGeneration;
         }
     }
 
@@ -371,8 +487,9 @@ export default class CodeableMember extends DependentMember {
      */
     getCodeContextManager(model) {
         let contextMember;
-        if(this.contextParentGeneration) {
-            contextMember = this.getRemoteContextMember(model);
+        let contextParentGeneration = this.getField("contextParentGeneration");
+        if(contextParentGeneration) {
+            contextMember = this.getRemoteContextMember(model,contextParentGeneration);
         }
         else {
             contextMember = this;
@@ -382,9 +499,9 @@ export default class CodeableMember extends DependentMember {
     }
 
     /** This function is used to get a remote context member */
-    getRemoteContextMember(model) {
+    getRemoteContextMember(model,contextParentGeneration) {
         let contextMember = this;
-        let parentCount = this.contextParentGeneration;
+        let parentCount = contextParentGeneration;
         while((parentCount)&&(contextMember)) {
             contextMember = contextMember.getParent(model);
             parentCount--;
@@ -493,3 +610,10 @@ export default class CodeableMember extends DependentMember {
 
 //add components to this class
 apogeeutil.mixin(CodeableMember,ContextHolder);
+
+
+//default optional settings values
+const DEAFULT_NO_SAVE = false;
+const DEAFULT_NO_SAVE_CHANGEABLE = true;
+const DEAFULT_FIELDS_LOCKED = false;
+const DEAFULT_FIELDS_LOCKED_CHANGEABLE = true;

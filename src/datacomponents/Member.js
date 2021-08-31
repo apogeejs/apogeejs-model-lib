@@ -17,7 +17,7 @@ import {FieldObject} from "/apogeejs-base-lib/src/apogeeBaseLib.js";
  * the hierarchy (maybe the model). */
 export default class Member extends FieldObject {
 
-    constructor(name,instanceToCopy,specialCaseIdValue) {
+    constructor(name,instanceToCopy,typeConfig,specialCaseIdValue) {
         super("member",instanceToCopy,specialCaseIdValue);
         
         //==============
@@ -25,10 +25,15 @@ export default class Member extends FieldObject {
         //==============
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
+            this.typeConfig = typeConfig;
+
             this.setField("name",name);
             //"data"
             //"pendingPromise"
             this.setField("state",apogeeutil.STATE_NONE);
+        }
+        else {
+            this.typeConfig = instanceToCopy.getTypeConfig();
         }
     }
 
@@ -99,6 +104,10 @@ export default class Member extends FieldObject {
         return null;
     }
 
+    getTypeConfig() {
+        return this.typeConfig;
+    }
+
     //================================================
     // Serialization Methods
     //================================================
@@ -107,7 +116,7 @@ export default class Member extends FieldObject {
     toJson(model) {
         var json = {};
         json.name = this.getField("name");
-        json.type = this.constructor.generator.type;
+        json.type = this.typeConfig.type;
         
         if(this.getFieldsJsonData) {
             let fields = this.getFieldsJsonData();
@@ -134,7 +143,6 @@ export default class Member extends FieldObject {
         else {
             //If this happens, we will just make it state normal 
             throw new Error("INVALID STATE: member " + this.getName());
-            return apogeeutil.STATE_NORMAL;
         }
     }
 

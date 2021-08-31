@@ -3,7 +3,7 @@ import Model from "/apogeejs-model-lib/src/data/Model.js";
 import Member from "/apogeejs-model-lib/src/datacomponents/Member.js";
 
 /** This class encapsulatees a table with no specific functionality. It
- * is intended to be used as a placeholder when a table generator is not found. */
+ * is intended to be used as a placeholder when a member type config is not found. */
 export default class ErrorTable extends Member {
 
     //------------------------------
@@ -49,7 +49,7 @@ export default class ErrorTable extends Member {
 /** This function creates a new instance */ 
 function createMember(model,json) {
     //note - we send in the complete JSON so we can return is on saving
-    let member = new ErrorTable(json.name,null,json.specialCaseIdValue);
+    let member = new ErrorTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
 
     //this is a bit clumsy, but we don't want to save the "specialCaseIdValue",
     //so we delete it if it is present
@@ -64,9 +64,10 @@ function createMember(model,json) {
     return member;
 }
 
-ErrorTable.generator = {};
-ErrorTable.generator.type = "apogee.ErrorMember";
-ErrorTable.generator.createMember = createMember;
+const TYPE_CONFIG = {
+    type: "apogee.ErrorMember",
+    createMember: createMember
+}
 
 //register this member
-Model.addMemberGenerator(ErrorTable.generator);
+Model.registerTypeConfig(TYPE_CONFIG);

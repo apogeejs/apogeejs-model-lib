@@ -62,18 +62,18 @@ export function createMember(model,parent,memberJson) {
     actionResult.event = ACTION_EVENT;
     
     //create member
-    let generator;
+    let typeConfig;
     if(memberJson) {
-        generator = Model.getMemberGenerator(memberJson.type);
+        typeConfig = Model.getMemberTypeConfig(memberJson.type);
     }
 
-    if(generator) {
-        member = generator.createMember(model,memberJson); 
+    if(typeConfig) {
+        member = typeConfig.createMember(model,memberJson); 
     }
     else {
         //type not found! - create a dummy object and add an error to it
-        let errorTableGenerator = Model.getMemberGenerator("apogee.ErrorMember");
-        member = errorTableGenerator.createMember(parent,memberJson);
+        let errorTableTypeConfig = Model.getMemberTypeConfig("apogee.ErrorMember");
+        member = errorTableTypeConfig.createMember(parent,memberJson);
         member.setError(model,"Member type not found: " + memberJson.type);
         errorMemberCreated = true;
     }

@@ -18,7 +18,7 @@ const DEFAULT_DEFAULT_VALUE = apogeeutil.INVALID_DATA;
 
 /** This function creates a new instance */ 
 function createMember(model,json) {
-    let member = new NoSaveJsonTable(json.name,null,null,json.specialCaseIdValue);
+    let member = new NoSaveJsonTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
 
     //get a copy of the initial data and set defaults if needed
     //NEED TO LOAD DEFAULT VALUE FROM JSON!!!
@@ -26,14 +26,10 @@ function createMember(model,json) {
     return member;
 }
 
-NoSaveJsonTable.generator = {};
-Object.assign(NoSaveJsonTable.generator,JsonTable.generator);
-NoSaveJsonTable.generator.type = "apogee.NoSaveJsonMember";
-NoSaveJsonTable.generator.createMember = createMember;
-NoSaveJsonTable.generator.setDataOk = true;
-NoSaveJsonTable.generator.setCodeOk = false;
-
-
+const TYPE_CONFIG = {
+    type: "apogee.NoSaveJsonMember",
+    createMember: createMember
+}
 
 //register this member
-Model.addMemberGenerator(NoSaveJsonTable.generator);
+Model.registerTypeConfig(TYPE_CONFIG);

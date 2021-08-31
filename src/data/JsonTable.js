@@ -8,6 +8,10 @@ import CodeableMember from "/apogeejs-model-lib/src/datacomponents/CodeableMembe
 */
 export default class JsonTable extends CodeableMember {
 
+    constructor(name,instanceToCopy,typeConfig,specialCaseIdValue) {
+        super(name,instanceToCopy,typeConfig,specialCaseIdValue,true/* setCodeOk */,true/* setDataOk */);
+    }
+
     //------------------------------
     // Codeable Methods
     //------------------------------
@@ -60,7 +64,7 @@ export default class JsonTable extends CodeableMember {
 
 /** This function creates a new instance */ 
 function createMember(model,json) {
-    let member = new JsonTable(json.name,null,json.specialCaseIdValue);
+    let member = new JsonTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
 
     //get a copy of the initial data and set defaults if needed
     let initialData = {};
@@ -80,11 +84,9 @@ function createMember(model,json) {
     return member;
 }
 
-JsonTable.generator = {};
-JsonTable.generator.type = "apogee.JsonMember";
-JsonTable.generator.createMember = createMember;
-JsonTable.generator.setDataOk = true;
-JsonTable.generator.setCodeOk = true;
+const TYPE_CONFIG = {
+    type: "apogee.JsonMember",
+    createMember: createMember
+}
 
-//register this member
-Model.addMemberGenerator(JsonTable.generator);
+Model.registerTypeConfig(TYPE_CONFIG);
