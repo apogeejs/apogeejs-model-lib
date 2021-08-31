@@ -39,12 +39,6 @@ export default class JsonTable extends CodeableMember {
         } 
     }
 
-    /** This is an optional method that, when present will allow the member data to be set if the 
-     * member function is cleared. */
-    getDefaultDataValue() {
-        return "";
-    }
-
     //------------------------------
     // Member Methods
     //------------------------------
@@ -65,22 +59,7 @@ export default class JsonTable extends CodeableMember {
 /** This function creates a new instance */ 
 function createMember(model,json) {
     let member = new JsonTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
-
-    //get a copy of the initial data and set defaults if needed
-    let initialData = {};
-    Object.assign(initialData,json.fields);
-
-    //if no value is set, set to an empty string
-    if(
-        (!initialData.functionBody) && //no function body (anything falsy is an invalid function)
-        (initialData.data === undefined) && //no data value set
-        (!initialData.error) && //no error (any error will set the error state)
-        (!initialData.errorList) && //DEPRECATED! no error list (any error list will set the error state)
-        (initialData.invalidValue !== true) //not invalid value
-    ) initialData.data = member.getDefaultDataValue();
-
-    member.loadFieldsForCreate(model,initialData);
-
+    member.loadFieldsForCreate(model,json.fields);
     return member;
 }
 

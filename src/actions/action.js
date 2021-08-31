@@ -338,7 +338,7 @@ function flattenActionResult(actionResult) {
 function addToCompletedResultList(actionResultInfo,actionResult) {
     actionResultInfo.actionModifiedMembers.push(actionResult);
     if(!actionResult.actionDone) actionResultInfo.actionDone = false;
-    if(actionResult.errorMsgList) actionResultInfo.errorMsgList.push(actionResult.errorMsg);
+    if(actionResult.errorMsg) actionResultInfo.errorMsgList.push(actionResult.errorMsg);
 
     if(actionResult.childActionResults) {
         actionResult.childActionResults.forEach( childActionResult => {

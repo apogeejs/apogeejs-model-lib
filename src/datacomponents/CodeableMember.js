@@ -23,16 +23,16 @@ import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMem
 export default class CodeableMember extends DependentMember {
 
     /** This initializes the component. Added arguments over member:
-     * - setCodeOk - This type allows setting code
-     * - setDataOk - This type allows setting data
+     * - baseSetCodeOk - This type allows setting code
+     * - baseSetDataOk - This type allows setting data
      */
-    constructor(name,instanceToCopy,typeConfig,specialCaseIdValue,setCodeOk,setDataOk) {
+    constructor(name,instanceToCopy,typeConfig,specialCaseIdValue,baseSetCodeOk,baseSetDataOk) {
         super(name,instanceToCopy,typeConfig,specialCaseIdValue);
 
         //mixin init where needed. This is not a scoep root. Parent scope is inherited in this object
         this.contextHolderMixinInit(false);
-        this.setCodeOk = setCodeOk;
-        this.setDataOk = setDataOk;
+        this.baseSetCodeOk = baseSetCodeOk;
+        this.baseSetDataOk = baseSetDataOk;
         
         //==============
         //Fields
@@ -235,14 +235,49 @@ export default class CodeableMember extends DependentMember {
     // Codeable Settings Methods
     //-----------------------------
 
+    /** This method should be used to set the "noSave" field", either to true or false.
+     * If the field is set to true, the base fields will automatically be set to the current state 
+     * of the member fields. Alternatively, if a different base fields setting is desired, it can be passed
+     * in with the argument optionalBaseFields. */
+    setNoSave(noSave,optionalBaseFields) {
+        if(this.getNoSaveChangeable()) {
+            this.setField("noSave",noSave);
+            if(noSave) {
+                let fields;
+                if(optionalBaseFields) {
+                    fields = optionalBaseFields;
+                }
+                else {
+                    fields = {};
+                    this._writeCodeAndDataFields(fields);
+                }
+                this.setField("baseFields",fields)
+            }
+            else {
+                this.clearField("noSave");
+                this.clearField("baseFields");
+            }
+        }
+    }
+
+    /** This method sets the the "fieldsLocked" field. The lkocked fields refer just to the
+     * code and data fields. */
+    setFieldsLocked(fieldsLocked) {
+        if(this.getFieldsLockedChangeable()) {
+            this.setFields("fieldsLocked",fieldsLocked)
+        }
+    }
+
     
     /** This returns true if this member accepts setting the data. */
     getSetDataOk() {
-        return this.setDataOk;
+        let fieldsLocked = this.getFieldsLocked();
+        return (this.baseSetDataOk)&&(!fieldsLocked);
     }
 
     getSetCodeOk() {
-        return this.setCodeOk;
+        let fieldsLocked = this.getFieldsLocked();
+        return (this.baseSetCodeOk)&&(!fieldsLocked);
     }
 
     getNoSave() {
@@ -273,8 +308,7 @@ export default class CodeableMember extends DependentMember {
     }
 
     getFieldsLocked() {
-        let typeConfig = this.getTypeConfig();
-        if(typeConfig.fieldsLockedChangeable !== undefined) {
+        if(this.getFieldsLockedChangeable()) {
             return this.getField("fieldsLocked");
         }
         else {
@@ -302,8 +336,16 @@ export default class CodeableMember extends DependentMember {
         }
     }
 
-    //to set DEAFULT_NO_SAVE, DEAFULT_NO_SAVE_CHANGEABLE, DEAFULT_FIELDS_LOCKED, DEAFULT_FIELDS_LOCKED_CHANGEABLE
-
+    /** This gives a default value for data. It is valid only if the data is settable. */
+     getDefaultDataValue() {
+        let typeConfig = this.getTypeConfig();
+        if(typeConfig.defaultDataValue !== undefined) {
+            return typeConfig.defaultDataValue;
+        }
+        else {
+            return DEFAULT_DATA;
+        }
+    }
 
     //------------------------------
     // Member Methods
@@ -362,6 +404,15 @@ export default class CodeableMember extends DependentMember {
         }
         
         //normal case
+        this._writeCodeAndDataFields(fields);
+
+        return fields;
+    }
+
+
+    /** This writes the code and data fields to the given fields json. 
+     * @private */
+    _writeCodeAndDataFields(fields) {
         if(this.hasCode()) {
             fields.argList = this.getArgList();
             fields.functionBody = this.getFunctionBody();
@@ -397,8 +448,6 @@ export default class CodeableMember extends DependentMember {
                 fields.data = this.getData();
             }
         }
-
-        return fields;
     }
 
     /** This member initialized the codeable fields for a member. This should only be called during create. */
@@ -406,20 +455,20 @@ export default class CodeableMember extends DependentMember {
         //handle the no save case
         if(this.getNoSaveChangeable()) {
             let noSave = (initialData.noSave !== undefined) ? initialData.noSave : this.getDefaultNoSave();
+            this.setField("noSave",noSave);
             if(noSave) {
-                //only save the noSave flag if it is true. Save the base fields too.
-                this.setField("noSave",true);
                 this.setField("baseFields",initialData);
             }
         }
         else if(this.getDefaultNoSave()) {
-            //if the noSave is not changeable (hardcoded) apply the default fields directly
-            initialData = this.getDefaultFields();
+            //if the noSave is not changeable (hardcoded) apply the default fields from typeConfig
+            let typeConfig = this.getTypeConfig();
+            initialData = typeConfig.defaultFields;
         }
 
         //read the locked settings, if they are settable
         if(this.getFieldsLockedChangeable()) {
-            let fieldsLocked = (initialData.fieldLocked !== undefined) ? initialData.fieldLocked : this.getDefaultFieldsLocked();
+            let fieldsLocked = (initialData.fieldsLocked !== undefined) ? initialData.fieldsLocked : this.getDefaultFieldsLocked();
             this.setField("fieldsLocked",fieldsLocked);
         }
 
@@ -429,14 +478,14 @@ export default class CodeableMember extends DependentMember {
         }
 
         //apply initial fields data/argList/functionBody/supplementalCode
-        if( ((initialData.functionBody !== undefined)||(!this.getSetDataOk())) && (this.getSetCodeOk())) {
+        if( ((initialData.functionBody !== undefined)||(!this.baseSetDataOk)) && (this.baseSetCodeOk)) {
             //set code
-            let argList = (initialData.argList !== undefined) ? initialData.argList : this.getDefaultArgList();
-            let functionBody = (initialData.functionBody !== undefined) ? initialData.functionBody : this.getDefaultFunctionBody();
-            let supplementalCode = (initialData.supplementalCode !== undefined) ? initialData.supplementalCode : this.getDefaultSupplementalCode();
+            let argList = (initialData.argList !== undefined) ? initialData.argList : DEFAULT_ARG_LIST;
+            let functionBody = (initialData.functionBody !== undefined) ? initialData.functionBody : DEFAULT_FUNCTION_BODY;
+            let supplementalCode = (initialData.supplementalCode !== undefined) ? initialData.supplementalCode : DEFAULT_SUPPLEMENTAL_CODE;
             this.applyCode(argList,functionBody,supplementalCode);
         }
-        else if(this.setDataOk()) {
+        else if(this.baseSetDataOk) {
             //set data
             if(initialData.error) {
                 //reconstruct the error
@@ -453,13 +502,13 @@ export default class CodeableMember extends DependentMember {
                 this.setResultInvalid(model);
             }
             else {
-                let data = (initialData.data !== undefined) ? initialData.data : this.getDefaultData();
+                let data = (initialData.data !== undefined) ? initialData.data : this.getDefaultDataValue();
                 this.setData(model,data);
             }
 
             //set the code fields to empty strings
-            this.setField("functionBody","");
-            this.setField("supplementalCode","");
+            this.setField("functionBody",DEFAULT_FUNCTION_BODY);
+            this.setField("supplementalCode",DEFAULT_SUPPLEMENTAL_CODE);
         }
     }
 
@@ -617,3 +666,8 @@ const DEAFULT_NO_SAVE = false;
 const DEAFULT_NO_SAVE_CHANGEABLE = true;
 const DEAFULT_FIELDS_LOCKED = false;
 const DEAFULT_FIELDS_LOCKED_CHANGEABLE = true;
+
+const DEFAULT_ARG_LIST = "";
+const DEFAULT_FUNCTION_BODY = "";
+const DEFAULT_SUPPLEMENTAL_CODE = "";
+const DEFAULT_DATA = "";

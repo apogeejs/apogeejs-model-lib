@@ -7,74 +7,55 @@ import FunctionTable from "/apogeejs-model-lib/src/data/FunctionTable.js";
  * the workspace under the name typeName. */
 export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCode) {
 
-    class HardcodedJsonTable extends JsonTable {
-
-        /** This overrides the get update data method so there is not saved data. */
-        getFieldsJsonData() {
-            return undefined;
-        }
-    }
-
-    /** This function creates a new instance */ 
     let createMember = function(model,json) {
-        let member = new HardcodedJsonTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
-
-        //set the initial data to the hardcoded code value
-        let initialData = {
-            argList: [],
-            functionBody: functionBody,
-            aupplementalCode: optionalPrivateCode ? optionalPrivateCode : ""
-        }
-
-        member.loadFieldsForCreate(model,initialData);
-
+        let member = new JsonTable(json.name,null,hardcodedDataTypeConfig,json.specialCaseIdValue);
+        member.loadFieldsForCreate(model,json.fields);
         return member;
     }
 
-    const TYPE_CONFIG = {
+    //Hardcoded - Fields are locked and not saved, default fields set.
+    const hardcodedDataTypeConfig = {
         type: typeName,
-        createMember: createMember
+        createMember: createMember,
+        defaultFields: {
+            argList: [],
+            functionBody: functionBody,
+            aupplementalCode: optionalPrivateCode ? optionalPrivateCode : ""
+        },
+        fieldsLockedChangeable: false,
+        defaultFieldsLocked: true,
+        noSaveChangeable: false,
+        defaultNoSave: true
     }
     
-    Model.registerTypeConfig(TYPE_CONFIG);
+    Model.registerTypeConfig(hardcodedDataTypeConfig);
 }
 
 /** This function defines a FunctionTable thatis hard coded. It is automatically added to
  * the workspace under the name typeName. */
 export function defineHardcodedFunctionTable(typeName,argListArray,functionBody,optionalPrivateCode) {
 
-    class HardcodedFunctionTable extends FunctionTable {
-
-        /** This overrides the get update data method so there is not saved data. */
-        getFieldsJsonData() {
-            return undefined;
-        }
-    }
-
-    /** This function creates a new instance */ 
     let createMember = function(model,json) {
-        let member = new HardcodedJsonTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
-
-        //set the initial data to the hardcoded code value
-        let initialData = {
-            argList: argListArray,
-            functionBody: functionBody,
-            aupplementalCode: optionalPrivateCode ? optionalPrivateCode : ""
-        }
-
-        member.loadFieldsForCreate(model,initialData);
-
+        let member = new FunctionTable(json.name,null,hardcodedFunctionTypeConfig,json.specialCaseIdValue);
+        member.loadFieldsForCreate(model,json.fields);
         return member;
     }
 
-    //DOH - I Should make this a constant.
-
-    const TYPE_CONFIG = {
+    const hardcodedFunctionTypeConfig = {
         type: typeName,
-        createMember: createMember
+        createMember: createMember,
+        defaultFields: {
+            argList: argListArray,
+            functionBody: functionBody,
+            aupplementalCode: optionalPrivateCode ? optionalPrivateCode : ""
+        },
+        fieldsLockedChangeable: false,
+        defaultFieldsLocked: true,
+        noSaveChangeable: false,
+        defaultNoSave: true
     }
     
-    Model.registerTypeConfig(TYPE_CONFIG);
+    Model.registerTypeConfig(hardcodedFunctionTypeConfig);
 }
 
 export function getSerializedHardcodedTable(instanceName,typeName) {
