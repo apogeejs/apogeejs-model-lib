@@ -451,58 +451,60 @@ export default class CodeableMember extends DependentMember {
     }
 
     /** This member initialized the codeable fields for a member. This should only be called during create. */
-    loadFieldsForCreate(model,initialData) {
+    loadFieldsForCreate(model,initialFields) {
+        if(!initialFields) initialFields = {};
+        
         //handle the no save case
         if(this.getNoSaveChangeable()) {
-            let noSave = (initialData.noSave !== undefined) ? initialData.noSave : this.getDefaultNoSave();
+            let noSave = (initialFields.noSave !== undefined) ? initialFields.noSave : this.getDefaultNoSave();
             this.setField("noSave",noSave);
             if(noSave) {
-                this.setField("baseFields",initialData);
+                this.setField("baseFields",initialFields);
             }
         }
         else if(this.getDefaultNoSave()) {
             //if the noSave is not changeable (hardcoded) apply the default fields from typeConfig
             let typeConfig = this.getTypeConfig();
-            initialData = typeConfig.defaultFields;
+            initialFields = typeConfig.defaultFields;
         }
 
         //read the locked settings, if they are settable
         if(this.getFieldsLockedChangeable()) {
-            let fieldsLocked = (initialData.fieldsLocked !== undefined) ? initialData.fieldsLocked : this.getDefaultFieldsLocked();
+            let fieldsLocked = (initialFields.fieldsLocked !== undefined) ? initialFields.fieldsLocked : this.getDefaultFieldsLocked();
             this.setField("fieldsLocked",fieldsLocked);
         }
 
         //read context parent, defaults to none if not in initial data.
-        if(initialData.contextParentGeneration) {
-            this.setField("contextParentGeneration",initialData.contextParentGeneration);
+        if(initialFields.contextParentGeneration) {
+            this.setField("contextParentGeneration",initialFields.contextParentGeneration);
         }
 
         //apply initial fields data/argList/functionBody/supplementalCode
-        if( ((initialData.functionBody !== undefined)||(!this.baseSetDataOk)) && (this.baseSetCodeOk)) {
+        if( ((initialFields.functionBody !== undefined)||(!this.baseSetDataOk)) && (this.baseSetCodeOk)) {
             //set code
-            let argList = (initialData.argList !== undefined) ? initialData.argList : DEFAULT_ARG_LIST;
-            let functionBody = (initialData.functionBody !== undefined) ? initialData.functionBody : DEFAULT_FUNCTION_BODY;
-            let supplementalCode = (initialData.supplementalCode !== undefined) ? initialData.supplementalCode : DEFAULT_SUPPLEMENTAL_CODE;
+            let argList = (initialFields.argList !== undefined) ? initialFields.argList : DEFAULT_ARG_LIST;
+            let functionBody = (initialFields.functionBody !== undefined) ? initialFields.functionBody : DEFAULT_FUNCTION_BODY;
+            let supplementalCode = (initialFields.supplementalCode !== undefined) ? initialFields.supplementalCode : DEFAULT_SUPPLEMENTAL_CODE;
             this.applyCode(argList,functionBody,supplementalCode);
         }
         else if(this.baseSetDataOk) {
             //set data
-            if(initialData.error) {
+            if(initialFields.error) {
                 //reconstruct the error
-                let error = new Error(initialData.error);
-                if(initialData.errorInfoList) {
-                    initialData.errorInfoList.forEach(errorInfo => apogeeutil.appendErrorInfo(errorInfo));
+                let error = new Error(initialFields.error);
+                if(initialFields.errorInfoList) {
+                    initialFields.errorInfoList.forEach(errorInfo => apogeeutil.appendErrorInfo(errorInfo));
                 }
-                if(initialData.errorValueData) {
-                    error.valueData = initialData.errorValueData;
+                if(initialFields.errorValueData) {
+                    error.valueData = initialFields.errorValueData;
                 }
                 this.setError(model,error);
             }
-            else if(initialData.invalidValue) {
+            else if(initialFields.invalidValue) {
                 this.setResultInvalid(model);
             }
             else {
-                let data = (initialData.data !== undefined) ? initialData.data : this.getDefaultDataValue();
+                let data = (initialFields.data !== undefined) ? initialFields.data : this.getDefaultDataValue();
                 this.setData(model,data);
             }
 
