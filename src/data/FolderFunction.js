@@ -57,9 +57,9 @@ export default class FolderFunction extends DependentMember {
 
     loadFieldsForCreate(model,initialData) {
         let argList = ((initialData)&&(initialData.argList !== undefined)) ? initialData.argList : [];
-        member.setField("argList",argList);
+        this.setField("argList",argList);
         let returnValueString = ((initialData)&&(initialData.returnValue !== undefined)) ? initialData.returnValue : [];
-        member.setField("returnValue",returnValueString);
+        this.setField("returnValue",returnValueString);
     }
 
     /** This is used for parents for creating the action for a local property update. (parent method, for a member function) */
@@ -380,7 +380,7 @@ function createMember(model,json) {
     member.setData(model,function(){});
 
     //load initial fields data
-    member.loadFieldsForCreate(json.fields);
+    member.loadFieldsForCreate(model,json.fields);
 
     //load parent/child data
     member.loadChildMetadata(json);
