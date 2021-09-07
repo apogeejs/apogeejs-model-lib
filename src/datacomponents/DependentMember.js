@@ -59,13 +59,6 @@ export default class DependentMember extends Member {
     // * should be added to the additionalUpdatedObjects list. */
     //updateDependeciesForModelChange(model,additionalUpdatedMembers);
 
-    ///** This is a check to see if the object should be checked for dependencies 
-    // * for recalculation. It allows to bypass the calculation steps if the member for some reason
-    // * does not need calculation. It is safe for this method to always return true and
-    // allow the calculation to happen. 
-    // * @private */
-    //memberUsesRecalculation();
-
     /** This does any init needed for calculation.  */
     prepareForCalculate() {
         this.calcPending = true;

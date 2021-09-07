@@ -37,13 +37,6 @@ export default class ErrorTable extends Member {
         //no action
     }
 
-    /** This is a check to see if the object should be checked for dependencies 
-     * for recalculation. It is safe for this method to always return false and
-     allow the calculation to happen.  */
-   memberUsesRecalculation() {
-        return false;
-    }
-
 }
 
 /** This function creates a new instance */ 

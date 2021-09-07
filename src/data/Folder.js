@@ -85,11 +85,6 @@ export default class Folder extends DependentMember {
     // Dependent Methods
     //------------------------------
 
-    /** There is no calculation for the folder base on dependents. */
-    memberUsesRecalculation() {
-        return true;
-    }
-
     /** This usually calculates the value of the member. However, in the case of a folder the value is already updated
      * once we initialize the impactors. We update the value incrementally so that we do not need to calculate all children
      * before any data is read from the folder. If we waited, we would get a circular dependecy if we trie to specify the 

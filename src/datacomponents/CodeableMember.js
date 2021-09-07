@@ -161,13 +161,13 @@ export default class CodeableMember extends DependentMember {
         return this.getField("compiledInfo") ? true : false;
     }
 
-    /** If this is false the member does not need to be calculated. */
-    memberUsesRecalculation() {
-        return this.hasCode();
-    }
-
     /** This method sets the data object for the member.  */
     calculate(model) {
+        //no calculation if there is no code. We shouldn't get here, but just in case.
+        if(!this.hasCode()) {
+            return;
+        }
+
         let compiledInfo = this.getField("compiledInfo");
         if(!compiledInfo) {
             this.setError(model,"Code not found for member: " + this.getName());

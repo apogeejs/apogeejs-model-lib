@@ -85,12 +85,6 @@ export default class FolderFunction extends DependentMember {
     //-------------------------------
     // Dependent Methods
     //-------------------------------
-        
-
-    /** If this is true the member must be executed. */
-    memberUsesRecalculation() {
-        return true;
-    }
 
     /** This updates the member data based on the function. It returns
      * true for success and false if there is an error.  */
