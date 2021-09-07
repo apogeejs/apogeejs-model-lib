@@ -161,7 +161,7 @@ export default class CodeableMember extends DependentMember {
         return this.getField("compiledInfo") ? true : false;
     }
 
-    /** If this is true the member is ready to be executed. */
+    /** If this is false the member does not need to be calculated. */
     memberUsesRecalculation() {
         return this.hasCode();
     }

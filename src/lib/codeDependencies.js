@@ -25,18 +25,10 @@ export function getDependencyInfo(varInfo,model,contextManager) {
                 if(impactor) {
                     //add as dependent
                     var memberId = impactor.getId();
-                    if(dependsOnMap[memberId] != apogeeutil.NORMAL_DEPENDENCY) {
-                        dependsOnMap[memberId] = apogeeutil.NORMAL_DEPENDENCY;
+                    if(dependsOnMap[memberId] != true) {
+                        dependsOnMap[memberId] = true;
                     }
                 }
-
-                //add the pass through members to the dependency map (give precedence to normal dependencies)
-                // passThroughDependencies.forEach(passThroughMember => {
-                //     var memberId = passThroughMember.getId();
-                //     if(dependsOnMap[memberId] == undefined) {
-                //         dependsOnMap[memberId] = apogeeutil.PASS_THROUGH_DEPENDENCY;
-                //     }
-                // });
             }
 		}
 	}

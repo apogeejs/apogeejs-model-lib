@@ -168,7 +168,7 @@ export default class Folder extends DependentMember {
         let childIdMap = this.getChildIdMap();
         for(var name in childIdMap) {
             var childId = childIdMap[name];
-            dependsOnMap[childId] = apogeeutil.NORMAL_DEPENDENCY;
+            dependsOnMap[childId] = true;
         }
         return dependsOnMap;
     }
