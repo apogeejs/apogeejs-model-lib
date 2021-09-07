@@ -46,8 +46,6 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  *      - model: (the model, if the object was the model)
  *      - member: (the member, if the object was a member)
  * }
- *  *   "actionPending": (This flag is returned if the action is a queued action and will be run after the
- *                  current action completes.)
  * 
  * ActionResult:
  * The return value of the an action function (not the doAction function) is an ActionResult struct, with the data below. The function should return
