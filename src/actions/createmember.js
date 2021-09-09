@@ -9,7 +9,6 @@ import Model from "/apogeejs-model-lib/src/data/Model.js";
  * {
  *  "action": "createMember",
  *  "parentId": (parent for new member),
- *  "name": (name of the new member),
  *  "createData": 
  *      - name
  *      - unique table type name
