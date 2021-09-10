@@ -2,9 +2,9 @@ import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import Model from "/apogeejs-model-lib/src/data/Model.js";
 import Member from "/apogeejs-model-lib/src/datacomponents/Member.js";
 
-/** This class encapsulatees a table with no specific functionality. It
+/** This class encapsulatees a member with no specific functionality. It
  * is intended to be used as a placeholder when a member type config is not found. */
-export default class ErrorTable extends Member {
+export default class ErrorMember extends Member {
 
     //------------------------------
     // Member Methods
@@ -42,7 +42,7 @@ export default class ErrorTable extends Member {
 /** This function creates a new instance */ 
 function createMember(model,json) {
     //note - we send in the complete JSON so we can return is on saving
-    let member = new ErrorTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
+    let member = new ErrorMember(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
 
     //this is a bit clumsy, but we don't want to save the "specialCaseIdValue",
     //so we delete it if it is present

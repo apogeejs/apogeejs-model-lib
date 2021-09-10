@@ -189,7 +189,7 @@ export default class FolderFunction extends DependentMember {
     // Private methods
     //============================
 
-    /** This method updates the table data object in the folder data map. 
+    /** This method updates the member data object in the folder data map. 
      * @private */
     calculateDependents(model) {
         let dependsOnMap = [];
@@ -259,7 +259,7 @@ export default class FolderFunction extends DependentMember {
                 initialized = true;
             }
             
-            //create an update array to set the table values for the input elements  
+            //create an update array to set the member values for the input elements  
             var updateActionList = [];
             for(var i = 0; i < inputMemberIdArray.length; i++) {
                 var entry = {};

@@ -256,7 +256,7 @@ function callActionFunction(model,actionData) {
 /** This method makes sure the member dependencies in the model are properly updated. 
  * @private */
 function updateDependenciesFromAction(model,actionModifiedMembers) {
-    //upate dependencies on table with updated code
+    //upate dependencies on member with updated code
     actionModifiedMembers.forEach(actionResult => {
         if((actionResult.member)&&(actionResult.member.isCodeable)&&(actionResult.updateMemberDependencies)) {
             actionResult.member.initializeDependencies(model);

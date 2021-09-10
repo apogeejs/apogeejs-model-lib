@@ -14,10 +14,10 @@ __globals__.__customControlDebugHook = function(args) {
     return args;
 }
 
-/** This is a wrapper used in function table creation to help make 
+/** This is a wrapper used in function member creation to help make 
  * debugging more readable, rather than placing this code in the section that
  * is obfuscated. */
-__globals__.__functionTableWrapper = function(functionName,source) {
+__globals__.__functionMemberWrapper = function(functionName,source) {
 
     //create member function for lazy initialization
     var wrappedMemberFunction = function(argList) {

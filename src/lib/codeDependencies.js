@@ -1,6 +1,6 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 
-/** This method takes the varInfo table from the code analysis and returns
+/** This method takes the varInfo member from the code analysis and returns
  * a lit of member objects which this member depends on.
  */
 export function getDependencyInfo(varInfo,model,contextManager) {

@@ -13,9 +13,9 @@ const APOGEE_FORBIDDEN_NAMES = {
  * @private */
 const NAME_PATTERN = /[a-zA-Z_$][0-9a-zA-Z_$]*/;
 
-/** This function validates a table name. It returns 
+/** This function validates a member name. It returns 
  * [valid,errorMsg]. */
-export function validateTableName(name) {
+export function validateMemberName(name) {
     var nameResult = {};
 
     //check if it is a keyword

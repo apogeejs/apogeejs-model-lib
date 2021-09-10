@@ -1,14 +1,14 @@
 
 import Model from "/apogeejs-model-lib/src/data/Model.js";
-import JsonTable from "/apogeejs-model-lib/src/data/JsonTable.js";
-import FunctionTable from "/apogeejs-model-lib/src/data/FunctionTable.js";
+import DataMember from "/apogeejs-model-lib/src/data/DataMember.js";
+import FunctionMember from "/apogeejs-model-lib/src/data/FunctionMember.js";
 
-/** This function defines a JsonTable that is hard coded. It is automatically added to
+/** This function defines a DataMember that is hard coded. It is automatically added to
  * the workspace under the name typeName. */
-export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCode) {
+export function defineHardcodedDataMember(typeName,functionBody,optionalPrivateCode) {
 
     let createMember = function(model,json) {
-        let member = new JsonTable(json.name,null,hardcodedDataTypeConfig,json.specialCaseIdValue);
+        let member = new DataMember(json.name,null,hardcodedDataTypeConfig,json.specialCaseIdValue);
         member.loadFieldsForCreate(model,json.fields);
         return member;
     }
@@ -31,12 +31,12 @@ export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCo
     Model.registerTypeConfig(hardcodedDataTypeConfig);
 }
 
-/** This function defines a FunctionTable thatis hard coded. It is automatically added to
+/** This function defines a FunctionMember thatis hard coded. It is automatically added to
  * the workspace under the name typeName. */
-export function defineHardcodedFunctionTable(typeName,argListArray,functionBody,optionalPrivateCode) {
+export function defineHardcodedFunctionMember(typeName,argListArray,functionBody,optionalPrivateCode) {
 
     let createMember = function(model,json) {
-        let member = new FunctionTable(json.name,null,hardcodedFunctionTypeConfig,json.specialCaseIdValue);
+        let member = new FunctionMember(json.name,null,hardcodedFunctionTypeConfig,json.specialCaseIdValue);
         member.loadFieldsForCreate(model,json.fields);
         return member;
     }
@@ -58,10 +58,29 @@ export function defineHardcodedFunctionTable(typeName,argListArray,functionBody,
     Model.registerTypeConfig(hardcodedFunctionTypeConfig);
 }
 
-export function getSerializedHardcodedTable(instanceName,typeName) {
+export function getSerializedHardcodedMember(instanceName,typeName) {
     return {
         "name": instanceName,
         "type": typeName
     }
+}
+
+
+/** legacy name 
+ * @deprecated */
+export function defineHardcodedJsonTable(typeName,functionBody,optionalPrivateCode) {
+    return defineHardcodedDataMember(typeName,functionBody,optionalPrivateCode);
+}
+
+/** legacy name 
+ * @deprecated */
+export function defineHardcodedFunctionTable(typeName,argListArray,functionBody,optionalPrivateCode) {
+    return defineHardcodedFunctionMember(typeName,argListArray,functionBody,optionalPrivateCode);
+}
+
+/** legacy name 
+ * @deprecated */
+export function getSerializedHardcodedTable(instanceName,typeName) {
+    return getSerializedHardcodedMember(instanceName,typeName);
 }
 

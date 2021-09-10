@@ -71,8 +71,8 @@ Parent.setChildrenWriteable = function(childrenWriteable) {
     }
 }
 
-/** This method adds a table to the folder. It also sets the folder for the
- *table object to this folder. It will fail if the name already exists.  */
+/** This method adds a member to the folder. It also sets the folder for the
+ *member object to this folder. It will fail if the name already exists.  */
 Parent.addChild = function(model,child) {
     
     //check if it exists first
@@ -100,7 +100,7 @@ Parent.addChild = function(model,child) {
 //This method should optionally be implemented for any additional actions when a Child is added.
 //Parent.onAddChild(model,child);
 
-/** This method removes a table from the folder. */
+/** This method removes a member from the folder. */
 Parent.removeChild = function(model,child) {
     //make sure this is a child of this object
     var parent = child.getParent(model);

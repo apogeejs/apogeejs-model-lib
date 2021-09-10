@@ -2,11 +2,11 @@ import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import Model from "/apogeejs-model-lib/src/data/Model.js";
 import CodeableMember from "/apogeejs-model-lib/src/datacomponents/CodeableMember.js";
 
-/** This class encapsulatees a data table for a JSON object. 
+/** This class encapsulatees a data member for a JSON object. 
  * (This object does also support function objects as elements of the json, though
- * objects using this, such as the JsonTableComponent, may not.)
+ * objects using this, such as the JsonComponent, may not.)
 */
-export default class JsonTable extends CodeableMember {
+export default class DataMember extends CodeableMember {
 
     constructor(name,instanceToCopy,typeConfig,specialCaseIdValue) {
         super(name,instanceToCopy,typeConfig,specialCaseIdValue,true/* setCodeOk */,true/* setDataOk */);
@@ -17,7 +17,7 @@ export default class JsonTable extends CodeableMember {
     //------------------------------
 
     /** This method returns the argument list. We override it because
-     * for JsonTable it gets cleared when data is set. However, whenever code
+     * for DataMember it gets cleared when data is set. However, whenever code
      * is used we want the argument list to be this value. */
     getArgList() {
         return [];
@@ -58,7 +58,7 @@ export default class JsonTable extends CodeableMember {
 
 /** This function creates a new instance */ 
 function createMember(model,json) {
-    let member = new JsonTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
+    let member = new DataMember(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
     member.loadFieldsForCreate(model,json.fields);
     return member;
 }

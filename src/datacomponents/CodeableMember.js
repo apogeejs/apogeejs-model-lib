@@ -200,7 +200,7 @@ export default class CodeableMember extends DependentMember {
                 this.setResultPending(model);
             }
             else if(error.isDependsOnError) {
-                //this is a depends on error from a member (presumably a fucntion table) we are calling
+                //this is a depends on error from a member (presumably a fucntion member) we are calling
                 this.setError(model,error);
             }
             //--------------------------------------

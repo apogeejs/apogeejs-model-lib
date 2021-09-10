@@ -9,7 +9,7 @@ import CodeableMember from "/apogeejs-model-lib/src/datacomponents/CodeableMembe
  * {
  *  "action": "updateData",
  *  "memberId": (member to update),
- *  "data": (new value for the table)
+ *  "data": (new value for the member)
  *  "sourcePromise": (OPTIONAL - If this is the completion of an asynchronous action, the
  *      source promise shoudl be included to make sure it has not been overwritten with a
  *      more recent operation.)
@@ -21,9 +21,9 @@ import CodeableMember from "/apogeejs-model-lib/src/datacomponents/CodeableMembe
  * {
  *  "action": "updateCode",
  *  "memberId": (member to update),
- *  "argList": (arg list for the table)
- *  "functionBody": (function body for the table)
- *  "supplementalCode": (supplemental code for the table)
+ *  "argList": (arg list for the member)
+ *  "functionBody": (function body for the member)
+ *  "supplementalCode": (supplemental code for the member)
  * }
  */
 

@@ -8,7 +8,7 @@ import {addActionInfo} from "/apogeejs-model-lib/src/actions/action.js";
  *  "action": "updateFolderFunction",
  *  "member": (member to move),
  *  "argList": (argument list, as an array of strings)
- *  "returnValue": (name of the return value table)
+ *  "returnValue": (name of the return value member)
  *  
  *  "eventInfo": (OUTPUT - event info for the associated delete event)
  * }

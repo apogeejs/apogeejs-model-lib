@@ -14,7 +14,7 @@ export default class Messenger {
      * updateMemberName - This is a member name as it would be accessed from the local code
      * data - This is the data to set on the given member. Aside from a JSON value, additional 
      * options are a Promise, to do an asynchronous update, a Error, to send an error to 
-     * that table, or apogeeutil.INVALID_VALUE to send the invalid value.
+     * that member, or apogeeutil.INVALID_VALUE to send the invalid value.
      * These updates are applied after the current calculation is completed. See documentation
      * for more information on the messenger. */
     dataUpdate(updateMemberName,data) {
@@ -24,7 +24,7 @@ export default class Messenger {
             throw new Error("Error calling messenger - member not fond: " + updateMemberName);
         }
         
-        //set the data for the table, along with triggering updates on dependent tables.
+        //set the data for the member, along with triggering updates on dependent members.
         var actionData = {};
         actionData.action = "updateData";
         actionData.memberId = member.getId();
@@ -46,7 +46,7 @@ export default class Messenger {
     /** This is similar to dataUpdate except is allows multiple values to be set.
      * The argument update info is an array with each element representing an individual
      * data update. Each element shoudl be a 2-element array with the first entry being
-     * the table name and the second being the data value. */
+     * the member name and the second being the data value. */
     compoundDataUpdate(updateInfo) { 
         
         //make the action list

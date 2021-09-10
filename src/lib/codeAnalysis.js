@@ -1,7 +1,7 @@
 import esprima from "/apogeejs-releases/releases/ext/esprima/v4.0.1/esprima.es.js";
 
-/** This function parses the code and returns a table that gives the variable use
- * in the passed function. The var info table has the following content
+/** This function parses the code and returns a member that gives the variable use
+ * in the passed function. The var info member has the following content
  * - it is a map with an entry for each variable accessed. (This refers just to
  * a variable and not to field access on that variable.
  * - the key for an entry is the name of the variable
@@ -278,7 +278,7 @@ export function analyzeCode(functionText) {
  * nodes correspond to variables, which we are collecting here.
  * - The variables are in two types of nodes, a simple Identifier node or a
  * MemberExpression, which is a sequence of Identifers.
- * - If the variable is a table, then this table is stored in the "depends on map"
+ * - If the variable is a member, then this member is stored in the "depends on map"
  * - In addition to determining which variables a fucntion depends on, some modifiers
  * are also collected for how the variable is used. 
  * -- is declaration - this node should contain an identifier that is a declaration
@@ -511,7 +511,7 @@ function processVariable(processInfo,node,isDeclaration,declarationKindInfo) {
         return;
     }
     
-    //add to the name table
+    //add to the name member
     var nameEntry = processInfo.nameTable[baseName];
     if(!nameEntry) {
         nameEntry = {};

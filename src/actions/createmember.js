@@ -11,8 +11,8 @@ import Model from "/apogeejs-model-lib/src/data/Model.js";
  *  "parentId": (parent for new member),
  *  "createData": 
  *      - name
- *      - unique table type name
- *      - additional table specific data
+ *      - unique member type name
+ *      - additional member specific data
  *      - specialCaseIdValue (this is only to be used in special cases, to set the ID of the created object)
  *  
  * }
@@ -71,8 +71,8 @@ export function createMember(model,parent,memberJson) {
     }
     else {
         //type not found! - create a dummy object and add an error to it
-        let errorTableTypeConfig = Model.getMemberTypeConfig("apogee.ErrorMember");
-        member = errorTableTypeConfig.createMember(parent,memberJson);
+        let errorMemberTypeConfig = Model.getMemberTypeConfig("apogee.ErrorMember");
+        member = errorMemberTypeConfig.createMember(parent,memberJson);
         member.setError(model,"Member type not found: " + memberJson.type);
         errorMemberCreated = true;
     }

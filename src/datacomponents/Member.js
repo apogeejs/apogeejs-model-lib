@@ -223,7 +223,7 @@ export default class Member extends FieldObject {
 
     /** This method sets the data for this object. This is the object used by the 
      * code which is identified by this name, for example the JSON object associated
-     * with a JSON table. */
+     * with a data member. */
     setData(model,data) {
         this.setStateAndData(model,apogeeutil.STATE_NORMAL,data);
     }
@@ -256,7 +256,7 @@ export default class Member extends FieldObject {
     }
 
     /** This sets the result invalid flag. If the result is invalid, any
-     * table depending on this will also have an invalid value. */
+     * member depending on this will also have an invalid value. */
     setResultInvalid(model) {
         this.setStateAndData(model,apogeeutil.STATE_INVALID,apogeeutil.INVALID_VALUE);
     }
@@ -293,7 +293,7 @@ export default class Member extends FieldObject {
 
         //kick off the asynch update
         var asynchCallback = memberValue => {
-            //set the data for the table, along with triggering updates on dependent tables.
+            //set the data for the member, along with triggering updates on dependent tables.
             let actionData = {};
             actionData.action = "updateData";
             actionData.memberId = this.getId();

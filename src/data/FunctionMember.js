@@ -3,7 +3,7 @@ import Model from "/apogeejs-model-lib/src/data/Model.js";
 import CodeableMember from "/apogeejs-model-lib/src/datacomponents/CodeableMember.js";
 
 /** This is a function. */
-export default class FunctionTable extends CodeableMember {
+export default class FunctionMember extends CodeableMember {
 
     constructor(name,instanceToCopy,typeConfig,specialCaseIdValue) {
         super(name,instanceToCopy,typeConfig,specialCaseIdValue,true/* setCodeOk */,false/* setDataOk */);
@@ -41,7 +41,7 @@ export default class FunctionTable extends CodeableMember {
                 if(state == apogeeutil.STATE_ERROR) {
                     //throw a depends on error
                     //it will be recieved by the member that triggered this init, if applicable
-                    issue = FunctionTable.createDependsOnError(model,[this]);
+                    issue = FunctionMember.createDependsOnError(model,[this]);
                 }
                 else if(state == apogeeutil.STATE_PENDING) {
                     issue = apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE;
@@ -76,7 +76,7 @@ export default class FunctionTable extends CodeableMember {
 
         //create the wrapped function - we call this from the debug file to make this cleaner for the
         //user, since they will run through it from the debugger.
-        let wrappedMemberFunction = __functionTableWrapper(this.getName(),source);
+        let wrappedMemberFunction = __functionMemberWrapper(this.getName(),source);
 
         //add an function on this function to allow external initialization if needed (if the function is not called before the model is locked)
         wrappedMemberFunction.initIfNeeded = source.initIfNeeded;
@@ -98,7 +98,7 @@ export default class FunctionTable extends CodeableMember {
                 memberFunction.initIfNeeded();
             }
             catch(error) {
-                //this error is already handled in the function table initializer
+                //this error is already handled in the function member initializer
                 //it is rethrown so a calling member can also get the error, since it was not present at regular intialization
                 //if we initialize here in lock, that means there is nobody who called this.
             }
@@ -129,7 +129,7 @@ export default class FunctionTable extends CodeableMember {
 
 /** This function creates a new instance */ 
 function createMember(model,json) {
-    let member = new FunctionTable(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
+    let member = new FunctionMember(json.name,null,TYPE_CONFIG,json.specialCaseIdValue);
     member.loadFieldsForCreate(model,json.fields);
     return member;
 }

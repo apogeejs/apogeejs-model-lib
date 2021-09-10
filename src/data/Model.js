@@ -158,7 +158,7 @@ export default class Model extends FieldObject {
 
     /** This function should be used to execute any action that is run asynchronously with the current
      * action. The action is run on a model and it is uncertain whether the existing model will still be 
-     * current when this new action is run. An example of when this is used is to populate a data table in
+     * current when this new action is run. An example of when this is used is to populate a data member in
      * response to a json request completing.  */
     doFutureAction(actionData) {
         //run this action asynchronously
