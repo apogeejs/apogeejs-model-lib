@@ -59,7 +59,7 @@ function updateCode(model,actionData) {
           
     //clear code case - function body and supplemental code are falsey - empty string (or null or undefined, which is not supposed to happen)
     //in this case, if the member has a default data value and data is settable, set the default value
-    if((!actionData.functionBody)&&(!actionData.supplementalCode)&&(member.getDefaultDataValue)&&(member.getSetDataOk())) {
+    if((!actionData.functionBody)&&(!actionData.supplementalCode)&&(member.getSetDataOk())) {
         //pass this to the update data function
         let modActionData = {
             action: "updateData",
