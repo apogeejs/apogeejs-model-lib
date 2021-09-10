@@ -64,7 +64,7 @@ function createMember(model,json) {
 }
 
 const TYPE_CONFIG = {
-    type: "apogee.JsonMember",
+    type: "apogee.DataMember",
     createMember: createMember
 }
 
