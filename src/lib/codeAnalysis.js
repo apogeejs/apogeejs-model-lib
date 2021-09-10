@@ -25,6 +25,7 @@ import esprima from "/apogeejs-releases/releases/ext/esprima/v4.0.1/esprima.es.j
  * @private */
 const syntax = {
     AssignmentExpression: [{name:'left'},{name:'right'}],
+    AssignmentPattern: [{name:'left'},{name:'right'}],
     ArrayExpression: [{name:'elements',list:true}],
     ArrayPattern: [{name:'elements',list:true}],
     ArrowFunctionExpression: [{name:'params',list:true,declaration:true},{name:'body'},{name:'defaults',list:true}],
@@ -43,6 +44,7 @@ const syntax = {
     ],
     ConditionalExpression: [{name:'test'},{name:'alternate'},{name:'consequent'}],
     ContinueStatement: [],
+    DebuggerStatement: [],
     DoWhileStatement: [{name:'body'},{name:'test',list:true}],
     EmptyStatement: [],
     ExpressionStatement: [{name:'expression'}],
@@ -80,6 +82,7 @@ const syntax = {
     SwitchStatement: [{name:'discriminant'},{name:'cases',list:true}],
     TemplateElement: [],
     TemplateLiteral: [{name:'quasis',list:true},{name:'expressions',list:true}],
+    TaggedTemplateExpression: [{name:'tag'},{name:'quasi'}],
     ThisExpression: [],
     ThrowStatement: [{name:'argument'}],
     TryStatement: [
@@ -106,23 +109,20 @@ const syntax = {
     
 
     //no support
-    AssignmentPattern: null,
-    ClassBody: null,
-    ClassDeclaration: null,
-    ClassExpression: null,
-    DebuggerStatement: null,
-    ExportAllDeclaration: null,
-    ExportDefaultDeclaration: null,
-    ExportNamedDeclaration: null,
-    ExportSpecifier: null,
-    ImportDeclaration: null,
-    ImportDefaultSpecifier: null,
-    ImportNamespaceSpecifier: null,
-    ImportSpecifier: null,
-    MetaProperty: null,
-    MethodDefinition: null,
-    Super: null,
-    TaggedTemplateExpression: null
+    ClassBody: null, //class related
+    ClassDeclaration: null, //class related
+    ClassExpression: null, //class related
+    ExportAllDeclaration: null, //module related
+    ExportDefaultDeclaration: null, //module related
+    ExportNamedDeclaration: null, //module related
+    ExportSpecifier: null, //module related
+    ImportDeclaration: null, //module related
+    ImportDefaultSpecifier: null, //module related
+    ImportNamespaceSpecifier: null, //module related
+    ImportSpecifier: null, //module related
+    MetaProperty: null, //class related
+    MethodDefinition: null, //class related
+    Super: null //class related
 
     //if we allowed module import, it would look like this I think
     //but we can not do this in a function, only a module
