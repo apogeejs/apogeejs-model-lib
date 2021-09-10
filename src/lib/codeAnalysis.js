@@ -292,7 +292,7 @@ function getVariableInfo(ast) {
     processInfo.scopeTable = {};
     
     //create the base scope
-    var scope = startScope(processInfo);
+    var scope = startScope(processInfo,FUNCTION_SCOPE); //program scope treated as function scope
 
     //traverse the tree, recursively
     processTreeNode(processInfo,ast,false);
@@ -308,9 +308,9 @@ function getVariableInfo(ast) {
 }
     
 /** This method starts a new loca variable scope, it should be called
- * when a function starts. 
+ * when a function or block starts. 
  * @private */
-function startScope(processInfo) {
+function startScope(processInfo,scopeType) {
     //initailize id gerneator
     if(processInfo.scopeIdGenerator === undefined) {
         processInfo.scopeIdGenerator = 0;
@@ -318,55 +318,84 @@ function startScope(processInfo) {
     
     //create scope
     var scope = {};
+    scope.type = scopeType;
     scope.id = String(processInfo.scopeIdGenerator++);
-    scope.parent = processInfo.currentScope;
+    scope.parent = (scopeType == BLOCK_SCOPE) ? processInfo.currentBlockScope : processInfo.currentFunctionScope;
     scope.localVariables ={};
     
     //save this as the current scope
     processInfo.scopeTable[scope.id] = scope;
-    processInfo.currentScope = scope;
+    if(scopeType == BLOCK_SCOPE) {
+        //only update block scope
+        processInfo.currentBlockScope = scope;
+    }
+    else {
+        //update both block and function scope
+        processInfo.currentFunctionScope = scope;
+        processInfo.currentBlockScope = scope;
+    }
+    
 }
 
 /** This method ends a local variable scope, reverting to the parent scope.
- * It should be called when a function exits. 
+ * It should be called when a function or block exits. 
  * @private */
-function endScope(processInfo) {
-    var currentScope = processInfo.currentScope;
-    if(!currentScope) return;
-    
+function endScope(processInfo,scopeType) {
     //set the scope to the parent scope.
-    processInfo.currentScope = currentScope.parent;
+    if(scopeType == BLOCK_SCOPE) {
+        let currentScope = processInfo.currentBlockScope;
+        if(currentScope) {
+            processInfo.currentBlockScope = currentScope.parent;
+        }
+    }
+    else {
+        let currentScope = processInfo.currentFunctionScope;
+        if(currentScope) {
+            processInfo.currentFunctionScope = currentScope.parent;
+            processInfo.currentBlockScope = currentScope.parent;
+        }
+    }
 }
 
 /** This method analyzes the AST (abstract syntax tree). 
  * @private */
-function processTreeNode(processInfo,node,isDeclaration) {
+function processTreeNode(processInfo,node,isDeclaration,declarationKindInfo) {
     
     //process the node type
     if((node.type == "Identifier")||(node.type == "MemberExpression")) {
         //process a variable
-        processVariable(processInfo,node,isDeclaration);
+        processVariable(processInfo,node,isDeclaration,declarationKindInfo);
     } 
     else if((node.type == "FunctionDeclaration")||(node.type == "FunctionExpression")) {
         //process the functoin
-        processFunction(processInfo,node);
-        
+        processFunction(processInfo,node); 
     }
-    else if((node.type === "NewExpression")&&(node.callee.type === "Function")) {
+    else if(node.type == "BlockStatement") {
+        //process the functoin
+        processBlock(processInfo,node);
+    }
+    else if((node.type == "NewExpression")&&(node.callee.type == "Function")) {
         //we currently do not support the function constructor
         //to add it we need to add the local variables and parse the text body
         throw createParsingError("Function constructor not currently supported!",node.loc); 
     }
+    else if(node.type == "VariableDeclaration") {
+        //this is processed like a generic node, but we want to include the declaration kind for when
+        //we do reach the variable we are declaring
+        declarationKindInfo = node.kind;
+
+        processGenericNode(processInfo,node,declarationKindInfo);
+    }
     else {
         //process some other node
-        processGenericNode(processInfo,node);
+        processGenericNode(processInfo,node,declarationKindInfo);
     }
 }
    
 /** This method process nodes that are not variabls identifiers. This traverses 
  * down the syntax tree.
  * @private */
-function processGenericNode(processInfo,node) {
+function processGenericNode(processInfo,node,declarationKindInfo) {
     //load the syntax node info list for this node
     var nodeInfoList = syntax[node.type];
     
@@ -396,12 +425,12 @@ function processGenericNode(processInfo,node) {
                 if(nodeInfo.list) {
                     //this is a list of child nodes
                     for(var j = 0; j < childField.length; j++) {
-                        processTreeNode(processInfo,childField[j],nodeInfo.declaration);
+                        processTreeNode(processInfo,childField[j],nodeInfo.declaration,declarationKindInfo);
                     }
                 }
                 else {
                     //this is a single node
-                    processTreeNode(processInfo,childField,nodeInfo.declaration);
+                    processTreeNode(processInfo,childField,nodeInfo.declaration,declarationKindInfo);
                 }
             }
         }
@@ -429,7 +458,7 @@ function processFunction(processInfo,node) {
     }
     
     //create a new scope for this function
-    var scope = startScope(processInfo);
+    var scope = startScope(processInfo,FUNCTION_SCOPE);
     
     if((nodeType === "FunctionExpression")&&(idNode)) {
         //parse id node (variable name) in the parent scope
@@ -448,10 +477,28 @@ function processFunction(processInfo,node) {
     endScope(processInfo,scope);
 }
 
-/** This method processes nodes that are variables (identifiers and member expressions), adding
- * them to the list of variables which are used in tehe formula.
+/** This method processes nodes that are function. For functions a new scope is created 
+ * for the body of the function.
  * @private */
-function processVariable(processInfo,node,isDeclaration) {
+ function processBlock(processInfo,node) {
+    var body = node.body;
+    
+    //create a new scope for this function
+    var scope = startScope(processInfo,BLOCK_SCOPE);
+    
+    //process the block body
+    for(var i = 0; i < body.length; i++) {
+        processTreeNode(processInfo,body[i],false);
+    }
+    
+    //end the scope for this function
+    endScope(processInfo,scope);
+}
+
+/** This method processes nodes that are variables (identifiers and member expressions), adding
+ * them to the list of variables which are used in the formula.
+ * @private */
+function processVariable(processInfo,node,isDeclaration,declarationKindInfo) {
     
     //get the variable path and the base name
     var namePath = getVariableDotPath(processInfo,node);
@@ -477,17 +524,28 @@ function processVariable(processInfo,node,isDeclaration) {
     //add a name use entry
     var nameUse = {};
     nameUse.path = namePath;
-    nameUse.scope = processInfo.currentScope;
+    nameUse.scope = processInfo.currentBlockScope; //we store the most specific use of the scope
     nameUse.node = node;
+
+//OOPS - which scope to get here? BGoth? JUst one? I need to remember what this is for
     
     nameEntry.uses.push(nameUse);
     
     //if this is a declaration store it as a local varaible
     if(isDeclaration) {
+        let declarationScope; 
+        if((declarationKindInfo == "const")||(declarationKindInfo == "let")) {
+            declarationScope = BLOCK_SCOPE;
+        }
+        else {
+            //this case is declarationKindInfo = "var" or not defined, for example from a function arg list 
+            declarationScope = FUNCTION_SCOPE;
+        }
+
         //store this in the local variables for this scope
-        var scopeLocalVariables = processInfo.currentScope.localVariables;
-        if(!scopeLocalVariables[baseName]) {
-            scopeLocalVariables[baseName] = true;
+        let currentScope = (declarationScope == BLOCK_SCOPE) ? processInfo.currentBlockScope : processInfo.currentFunctionScope;
+        if(!currentScope.localVariables[baseName]) {
+            currentScope.localVariables[baseName] = true;
         }
         else {
             //the variable is being redeclared! that is ok.
@@ -624,3 +682,6 @@ function createErrorInfoFromAstInfo(functionText,astErrors) {
     errorInfo.code = functionText;
     return {errorMsg,errorInfo};
 }
+
+const FUNCTION_SCOPE = "function";
+const BLOCK_SCOPE = "block";
