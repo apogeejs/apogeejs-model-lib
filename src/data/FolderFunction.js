@@ -15,8 +15,7 @@ export default class FolderFunction extends DependentMember {
 
         //mixin init where needed
         this.contextHolderMixinInit();
-        let instanceTypeConfig = this.getTypeConfig();
-        this.parentMixinInit(instanceToCopy,instanceTypeConfig.changeChildrenWriteable,instanceTypeConfig.defaultChildrenWriteable);
+        this.parentMixinInit(instanceToCopy,false,false);
 
         //==============
         //Fields
@@ -384,9 +383,7 @@ function createMember(model,json) {
 
 const TYPE_CONFIG = {
     type: "apogee.FolderFunction",
-    createMember: createMember,
-    changeChildrenWriteable: false,
-    defaultChildrenWriteable: false
+    createMember: createMember
 }
 
 Model.registerTypeConfig(TYPE_CONFIG);
