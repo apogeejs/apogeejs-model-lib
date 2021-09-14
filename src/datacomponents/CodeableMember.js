@@ -339,7 +339,10 @@ export default class CodeableMember extends DependentMember {
     /** This gives a default value for data. It is valid only if the data is settable. */
      getDefaultDataValue() {
         let typeConfig = this.getTypeConfig();
-        if(typeConfig.defaultDataValue !== undefined) {
+        if(typeConfig.defaultDataValueInvalid) {
+            return apogeeutil.INVALID_VALUE;
+        }
+        else if(typeConfig.defaultDataValue !== undefined) {
             return typeConfig.defaultDataValue;
         }
         else {
