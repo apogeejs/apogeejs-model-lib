@@ -29,18 +29,12 @@ export default class Messenger {
         actionData.action = "updateData";
         actionData.memberId = member.getId();
         actionData.data = data;
-        if(data instanceof Promise) {
+
+        //if(data instanceof Promise) {
             //for now no callback on promise
-        }
-        
-        //return is handled above asynchronously
-        if(this.model.getIsLocked()) {
-            //the messenger would work improperly here
-            throw new Error("Error: Messenger must only be called during member formula calculation.");
-        }
-        else {
-            doAction(this.model,actionData);
-        }
+        //}
+
+        this._executeAction(actionData)
     }
 
     /** This is similar to dataUpdate except is allows multiple values to be set.
@@ -75,20 +69,32 @@ export default class Messenger {
         actionData.action = "compoundAction";
         actionData.actions = actionList;
         
-        //return is handled above asynchronously
-        if(this.model.getIsLocked()) {
-            //the messenger would work improperly here
-            throw new Error("Error: Messenger must only be called during member formula calculation.");
-        }
-        else {
-            doAction(this.model,actionData);
-        }
+        this._executeAction(actionData);
     }
     
     //=====================
     // Private Functions
     //=====================
-    
+
+    _executeAction(actionData) {
+        if((this.model.isActionInProgress())||(!this.model.getIsLocked())) {
+            //this is an action sent from within a model calculation (SEE ROUTING EXCEPTION BELOW)
+            //run action directly - this will be placed in action queue and run before the 
+            //original doAction call returns (and updates the UI)
+            doAction(this.model,actionData);
+        }
+        else {
+            //this is an action passed in from outside (SEE ROUTING EXCEPTION BELOW)
+            //run this as an external command, asynchronously
+            this.model.doFutureAction(actionData); 
+        }
+
+        //ROUTING EXCEPTION - The messenger is initialized with a copy of the model. If the member
+        //that holds the messenger is not in the latest model update, it will not hold the latest model.
+        //In this case, checks if we are in a model calculation wil return negative because we are not in 
+        //the calculation for THAT model. It will pass the action through a command rather than putting it in the action queue.
+        //WE COULD FIX THIS BY ADDING A DEPENDCY ON THE MODEL OBJECT.
+    }
     
     /** This method returns the member instance for a given local member name,
      * as defined from the source object context. */

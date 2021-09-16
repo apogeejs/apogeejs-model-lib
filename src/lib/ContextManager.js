@@ -55,9 +55,9 @@ ContextManager.prototype.getValue = function(model,varName) {
     return data;
 }
 
-ContextManager.prototype.getMember = function(model,pathArray,optionalParentMembers) {
+ContextManager.prototype.getMember = function(model,pathArray) {
     let index = 0;
-    var impactor = this.lookupMember(model,pathArray,index,optionalParentMembers);
+    var impactor = this.lookupMember(model,pathArray,index);
     
     //if the object is not in this context, check with the parent context
     if(!impactor) {
@@ -65,7 +65,7 @@ ContextManager.prototype.getMember = function(model,pathArray,optionalParentMemb
             var parent = this.contextHolder.getParent(model);
             if(parent) {
                 var parentContextManager = parent.getContextManager();
-                impactor = parentContextManager.getMember(model,pathArray,optionalParentMembers);
+                impactor = parentContextManager.getMember(model,pathArray);
             }
         }
     }
@@ -106,7 +106,7 @@ ContextManager.prototype.lookupValue = function(model,varName) {
     return undefined;
 }
 
-ContextManager.prototype.lookupMember = function(model,pathArray,index,optionalParentMembers) {
+ContextManager.prototype.lookupMember = function(model,pathArray,index) {
     var impactor;
     for(var i = 0; i < this.contextList.length; i++) {
         var entry = this.contextList[i];        
@@ -117,9 +117,6 @@ ContextManager.prototype.lookupMember = function(model,pathArray,index,optionalP
             if((impactor)&&(impactor.isContextHolder)) {
                 let childImpactor = impactor.getContextManager().lookupMember(model,pathArray,index+1);
                 if(childImpactor) {
-                    if(optionalParentMembers) {
-                        optionalParentMembers.push(impactor);
-                    }
                     impactor = childImpactor;
                 }
             }

@@ -284,6 +284,7 @@ export default class Model extends FieldObject {
     // MemberMap Functions
     //============================
 
+    /** This returns the member (or the model) given by the member (or model) id */
     lookupMemberById(memberId) {
         let activeMemberMap = this._getActiveMemberMap()
         return activeMemberMap[memberId];

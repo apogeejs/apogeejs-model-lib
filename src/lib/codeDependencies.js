@@ -17,9 +17,8 @@ export function getDependencyInfo(varInfo,model,contextManager) {
                 //look up the object
                 var namePath = nameUse.path;
 
-                //lookup this object, along with the passthrough dependencies
-                let passThroughDependencies = [];
-                var impactor = contextManager.getMember(model,namePath,passThroughDependencies);
+                //lookup this object
+                var impactor = contextManager.getMember(model,namePath);
 
                 //add the impactor to the dependency map
                 if(impactor) {
