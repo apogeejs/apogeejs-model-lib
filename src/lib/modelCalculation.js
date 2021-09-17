@@ -17,9 +17,9 @@ export function addToRecalculateList(model,recalculateList,member) {
     addDependsOnToRecalculateList(model,recalculateList,member);
 }
 
-export function addDependsOnToRecalculateList(model,recalculateList,member) {
+export function addDependsOnToRecalculateList(model,recalculateList,object) {
     //add any member that depends on this one  
-    var impactsList = model.getImpactsList(member);
+    var impactsList = model.getImpactsList(object);
     for(var i = 0; i < impactsList.length; i++) {
         let dependent = model.getMutableMember(impactsList[i]);
         addToRecalculateList(model,recalculateList,dependent);

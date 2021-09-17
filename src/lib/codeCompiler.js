@@ -157,7 +157,7 @@ function createGeneratorBody(memberFunctionName,varInfo, combinedFunctionBody) {
         var baseNameInfo = varInfo[baseName];
         
         //do not add context variable for local or "returnValue", which is explicitly defined
-        if((baseName === "returnValue")||(baseNameInfo.isLocal)) continue;
+        if((baseName === "returnValue")||(baseNameInfo.isLocal)||(baseNameInfo.scopeInjects)) continue;
         
         //add a declaration
         contextDeclarationText += "\nvar " + baseName + ";";
@@ -191,12 +191,10 @@ return {
 }
 
    
-/** This line is added when getting the dependencies to account for some local 
- * variables in the member function.
+/** This line is added for analyzing the body to add any desired header information.
  * @private */
 function getEffectiveFunctionBodyHeader(memberFunctionName) {
     return `'use strict'
-var apogeeMessenger, __memberFunctionDebugHook;
 `
 }
    

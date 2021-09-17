@@ -121,7 +121,7 @@ function updateData(model,actionData) {
 
     //see if there were any dependents, to know if we need to update them
     //on setting data there will be none.
-    let hadDependents = ((member.getDependsOn)&&(apogeeutil.jsonObjectLength(member.getDependsOn()) > 0));
+    let hadDependents = ((member.getDependsOn)&&(apogeeutil._.size(member.getDependsOn()) > 0));
     
     //if we set data, clear code (unless this is data from a resolved promise)
     if((member.isCodeable)&&(!resolvedPromise)) {

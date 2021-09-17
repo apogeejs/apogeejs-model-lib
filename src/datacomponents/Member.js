@@ -52,7 +52,7 @@ export default class Member extends FieldObject {
         let name = this.getField("name");
         let parentId = this.getField("parentId");
         if(parentId) {
-            let parent = model.lookupMemberById(parentId);
+            let parent = model.lookupObjectById(parentId);
             if(parent) {
                 return parent.getChildFullName(model,name);
             }
@@ -86,7 +86,7 @@ export default class Member extends FieldObject {
     /** This returns the parent for this member. */
     getParent(model) {
         let parentId = this.getField("parentId");
-        return model.lookupMemberById(parentId);
+        return model.lookupObjectById(parentId);
     }
 
     /** This returns the parent for this member. For the root folder
@@ -94,7 +94,7 @@ export default class Member extends FieldObject {
     getParentMember(model) {
         let parentId = this.getField("parentId");
         if(parentId) {
-            let parent = model.lookupMemberById(parentId);
+            let parent = model.lookupObjectById(parentId);
             if((parent)&&(parent instanceof Member)) {
                 return parent;
             }
@@ -356,7 +356,7 @@ export default class Member extends FieldObject {
         //notify parent of update
         let parentId = this.getField("parentId");
         if(parentId) {
-            let parent = model.getMutableMember(parentId);
+            let parent = model.getMutableParent(parentId);
             parent.childDataUpdate(model,this);
         }
     }

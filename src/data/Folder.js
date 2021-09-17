@@ -128,7 +128,7 @@ export default class Folder extends DependentMember {
         let childIdMap = this.getChildIdMap();
         for(var name in childIdMap) {
             let childId = childIdMap[name];
-            var child = model.lookupMemberById(childId);
+            var child = model.lookupObjectById(childId);
             if((child)&&(child.isDependent)) {
                 child.updateDependeciesForModelChange(model,additionalUpdatedMembers);
             }

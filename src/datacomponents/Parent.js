@@ -45,7 +45,7 @@ Parent.lookupChildId = function(name) {
 Parent.lookupChild = function(model,name) {
     let childId = this.lookupChildId(name);
     if(childId) {
-        return model.lookupMemberById(childId);
+        return model.lookupObjectById(childId);
     }
     else {
         return null;
@@ -141,7 +141,7 @@ Parent.onClose = function(model) {
     let childIdMap = this.getField("childIdMap");
     for(var key in childIdMap) {
         var childId = childIdMap[key];
-        let child = model.lookupMemberById(childId);
+        let child = model.lookupObjectById(childId);
         if((child)&&(child.onClose)) child.onClose(model);
     }
 
@@ -254,7 +254,7 @@ Parent.writeChildData = function(model,json) {
 	let childIdMap = this.getChildIdMap();
 	for(var name in childIdMap) {
 		let childId = childIdMap[name];
-		let child = model.lookupMemberById(childId);
+		let child = model.lookupObjectById(childId);
 		json.children[name] = child.toJson(model);
 	}
 }

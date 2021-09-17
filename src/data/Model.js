@@ -30,17 +30,17 @@ export default class Model extends FieldObject {
         if(!instanceToCopy) {
             this.setField("name",Model.DEFAULT_MODEL_NAME);
             this.setField("impactsMap",{});
-            //create the member map, with the model included
-            let memberMap = {};
-            memberMap[this.getId()] = this;
-            this.setField("memberMap",memberMap);
+            //create the object map, with the model included
+            let objectMap = {};
+            objectMap[this.getId()] = this;
+            this.setField("objectMap",objectMap);
         }
 
         //==============
         //Working variables
         //==============
         this.workingImpactsMap = null;
-        this.workingMemberMap = null;
+        this.workingObjectMap = null;
         this.workingChangeMap = {};
 
         //add a change map entry for this object
@@ -60,12 +60,12 @@ export default class Model extends FieldObject {
             //create a new instance that is a copy of this one
             let newModel = new Model(this.runContext,this);
 
-            //update the member map for the new model
-            let newMemberMap = {};
-            let oldMemberMap = newModel.getField("memberMap");
-            Object.assign(newMemberMap,oldMemberMap);
-            newMemberMap[newModel.getId()] = newModel;
-            newModel.setField("memberMap",newMemberMap);
+            //update the object map for the new model
+            let newObjectMap = {};
+            let oldObjectMap = newModel.getField("objectMap");
+            Object.assign(newObjectMap,oldObjectMap);
+            newObjectMap[newModel.getId()] = newModel;
+            newModel.setField("objectMap",newObjectMap);
 
             return newModel;
         }
@@ -81,55 +81,55 @@ export default class Model extends FieldObject {
     getCleanCopy(newRunContext) {
         //make sure the stored fields are up to date
         if(this.workingImpactsMap) this.finalizeImpactsMap();
-        if(this.workingMemberMap) this.finalizeMemberMap();
+        if(this.workingObjectMap) this.finalizeObjectMap();
 
         let newModel = new Model(newRunContext,this);
 
-        //update the member map for the new model
-        let oldMemberMap = this.getField("memberMap");
+        //update the object map for the new model
+        let oldObjectMap = this.getField("objectMap");
 
-        newModel._populateWorkingMemberMap();
-        newModel.workingMemberMap[newModel.getId()] = newModel;
+        newModel._populateWorkingObjectMap();
+        newModel.workingObjectMap[newModel.getId()] = newModel;
 
-        for(let memberId in oldMemberMap) {
-            let member = oldMemberMap[memberId];
-            if((member != this)&&(!member.getIsLocked())) {
-                //create a new copy of the member and register it.
-                let newMember = new member.constructor(member.getName(),member);
-                newModel.workingMemberMap[newMember.getId()] = newMember;
+        for(let objectId in oldObjectMap) {
+            let object = oldObjectMap[objectId];
+            if((object != this)&&(!object.getIsLocked())) {
+                //create a new copy of this member and register it.
+                let newMember = new object.constructor(object.getName(),object);
+                newModel.workingObjectMap[newMember.getId()] = newMember;
             }
         }
 
         return newModel;
     }
 
-    /** This method locks all member instances and the model instance. */
+    /** This method locks all object instances and the model instance. */
     lockAll() {
         //clear up working fields
         this.workingChangeMap = null;
 
         //make sure the other working fields have been saved
         if(this.workingImpactsMap) this.finalizeImpactsMap();
-        if(this.workingMemberMap) this.finalizeMemberMap();
+        if(this.workingObjectMap) this.finalizeObjectMap();
 
-        //member map includes all members and the model
-        let memberMap = this.getField("memberMap");
-        for(let id in memberMap) {
+        //object map includes all objects and the model
+        let objectMap = this.getField("objectMap");
+        for(let id in objectMap) {
             //this will lock the model too
-            //we maybe shouldn't be modifying the members in place, but we will do it anyway
-            memberMap[id].lock();
+            //we maybe shouldn't be modifying the objects in place, but we will do it anyway
+            objectMap[id].lock();
         }
     }
 
     /** This completes any lazy initialization. This must be done before the model and the members are locked. 
      * Any member not yet initialized would be a lazy initialize function that was neever called. */
     completeLazyInitialization() {
-        //member map includes all members and the model
-        let activeMemberMap = this._getActiveMemberMap();
-        for(let id in activeMemberMap) {
-            let member = activeMemberMap[id];
-            if(member.lazyInitializeIfNeeded) {
-                member.lazyInitializeIfNeeded();
+        //object map includes all members and the model
+        let activeObjectMap = this._getActiveObjectMap();
+        for(let id in activeObjectMap) {
+            let object = activeObjectMap[id];
+            if(object.lazyInitializeIfNeeded) {
+                object.lazyInitializeIfNeeded();
             }
         }
     }
@@ -143,10 +143,10 @@ export default class Model extends FieldObject {
         } 
     }
 
-    finalizeMemberMap() {
-        if(this.workingMemberMap) {
-            this.setField("memberMap",this.workingMemberMap);
-            this.workingMemberMap = null;
+    finalizeObjectMap() {
+        if(this.workingObjectMap) {
+            this.setField("objectMap",this.workingObjectMap);
+            this.workingObjectMap = null;
         }
     }
 
@@ -182,7 +182,7 @@ export default class Model extends FieldObject {
         let childIdMap = this.getChildIdMap();
         for(var name in childIdMap) {
             var childId = childIdMap[name];
-            let child = this.lookupMemberById(childId);
+            let child = this.lookupObjectById(childId);
             if((child)&&(child.isDependent)) {
                 child.updateDependeciesForModelChange(this,additionalUpdatedMembers);
             }
@@ -281,21 +281,24 @@ export default class Model extends FieldObject {
     }
 
     //============================
-    // MemberMap Functions
+    // ObjectMap Functions
     //============================
 
-    /** This returns the member (or the model) given by the member (or model) id */
-    lookupMemberById(memberId) {
-        let activeMemberMap = this._getActiveMemberMap()
-        return activeMemberMap[memberId];
+    /** This returns the member or the model given by the id */
+    lookupObjectById(objectId) {
+        let activeObjectMap = this._getActiveObjectMap()
+        return activeObjectMap[objectId];
     }
 
     /** This method returns a mutable member for the given ID. If the member is already unlocked, that member will be
      * returned. Otherwise a copy of the member will be made and stored as the active instance for the member ID.  */
     getMutableMember(memberId) {
         if(this.getIsLocked()) throw new Error("The model must be unlocked to get a mutable member.");
+        
+        //this should not be called to get a mutable copy of the model
+        if(memberId == this.getId()) throw new Error("Given ID is not a member ID!");
 
-        let member = this.lookupMemberById(memberId);
+        let member = this.lookupObjectById(memberId);
         if(member) {
             if(member.getIsLocked()) {
                 //create a unlocked copy of the member
@@ -314,9 +317,27 @@ export default class Model extends FieldObject {
         }
     }
 
+    /** This method returns a mutable copy of the given object. It will either run the function
+     * getMutableMember, creating a mutable instance, or it will return the model instance if it is 
+     * mutable. This will throw an error if the model is not mutable. This is used in cases where the model
+     * should already have been made mutable, such as from within an action. */
+    getMutableParent(objectId) {
+        if(objectId = this.getId()) {
+            if(this.getIsLocked()) {
+                throw new Error("The model is locked!");
+            }
+            else {
+                return this;
+            }
+        }
+        else {
+            return this.getMutableMember(objectId);
+        }
+    }
+
     registerMember(member) {
-        if(!this.workingMemberMap) {
-            this._populateWorkingMemberMap();
+        if(!this.workingObjectMap) {
+            this._populateWorkingObjectMap();
         }
 
         let memberId = member.getId();
@@ -326,7 +347,7 @@ export default class Model extends FieldObject {
         if(!changeMapEntry) {
             //if it already existed we don't need to change it (that means it was a create and we want to keep that)
             //otherwise add a new entry
-            if(this.workingMemberMap[memberId]) {
+            if(this.workingObjectMap[memberId]) {
                 //this is an update
                 this.workingChangeMap[memberId] = {action: "updated", instance: member};
             }
@@ -337,12 +358,12 @@ export default class Model extends FieldObject {
         }
 
         //add or update the member in the working member map
-        this.workingMemberMap[memberId] = member;
+        this.workingObjectMap[memberId] = member;
     }
 
     unregisterMember(member) {
-        if(!this.workingMemberMap) {
-            this._populateWorkingMemberMap();
+        if(!this.workingObjectMap) {
+            this._populateWorkingObjectMap();
         }
 
         let memberId = member.getId();
@@ -373,47 +394,46 @@ export default class Model extends FieldObject {
         }
 
         //remove the member entry
-        delete this.workingMemberMap[memberId];
+        delete this.workingObjectMap[memberId];
     }
 
     /** This should be called to get a copy of the active working map when no changes are being
-     * made to the map. If changes are being made, typically they should be done to the workingMemberMap.  */
-    _getActiveMemberMap() {
-        return this.workingMemberMap ? this.workingMemberMap : this.getField("memberMap");
+     * made to the map. If changes are being made, typically they should be done to the workingObjectMap.  */
+    _getActiveObjectMap() {
+        return this.workingObjectMap ? this.workingObjectMap : this.getField("objectMap");
     }
 
-    /** This method makes a mutable copy of the member map, and places it in the working member map. */
-    _populateWorkingMemberMap() {
-        let memberMap = this.getField("memberMap");
-        let newMemberMap = {};
-        Object.assign(newMemberMap,memberMap);
-        this.workingMemberMap = newMemberMap;
+    /** This method makes a mutable copy of the object map, and places it in the working object map. */
+    _populateWorkingObjectMap() {
+        let objectMap = this.getField("objectMap");
+        let newObjectMap = {};
+        Object.assign(newObjectMap,objectMap);
+        this.workingObjectMap = newObjectMap;
     }
 
     //============================
     // Impact List Functions
     //============================
 
-    /** This returns an array of members this member impacts. */
-    getImpactsList(member) {
+    /** This returns an array of members this object impacts. */
+    getImpactsList(object) {
         let impactsMap = this.getField("impactsMap");
-        let impactsList = impactsMap[member.getId()];
+        let impactsList = impactsMap[object.getId()];
         if(!impactsList) impactsList = [];
         return impactsList;
     }
     
-    /** This method adds a data member to the imapacts list for this node.
-     * The return value is true if the member was added and false if it was already there. 
-     * NOTE: the member ID can be a string or integer. This dependentMemberId should be an int. */
-    addToImpactsList(depedentMemberId,memberId) {
+    /** This method adds a member to the imapacts list for this object.
+     * The return value is true if the member was added and false if it was already there. */
+    addToImpactsList(depedentMemberId,objectId) {
         //don't let a member impact itself
-        if(memberId === depedentMemberId) return;
+        if(objectId === depedentMemberId) return;
 
-        let workingMemberImpactsList = this.getWorkingMemberImpactsList(memberId);
+        let workingImpactsList = this._getWorkingImpactsList(objectId);
 
         //add to the list iff it is not already there
-        if(workingMemberImpactsList.indexOf(depedentMemberId) === -1) {
-            workingMemberImpactsList.push(depedentMemberId);
+        if(workingImpactsList.indexOf(depedentMemberId) === -1) {
+            workingImpactsList.push(depedentMemberId);
             return true;
         }
         else {
@@ -421,22 +441,23 @@ export default class Model extends FieldObject {
         }
     }
 
-    /** This method removes a data member from the imapacts list for this node. */
-    removeFromImpactsList(depedentMemberId,memberId) {
+    /** This method removes a member from the imapacts list for this object. */
+    removeFromImpactsList(depedentMemberId,objectId) {
 
-        let workingMemberImpactsList = this.getWorkingMemberImpactsList(memberId);
+        let workingImpactsList = this._getWorkingImpactsList(objectId);
 
         //it should appear only once
-        for(var i = 0; i < workingMemberImpactsList.length; i++) {
-            if(workingMemberImpactsList[i] == depedentMemberId) {
-                workingMemberImpactsList.splice(i,1);
+        for(var i = 0; i < workingImpactsList.length; i++) {
+            if(workingImpactsList[i] == depedentMemberId) {
+                workingImpactsList.splice(i,1);
                 return;
             }
         }
     }
     
-    /** This gets a edittable copy of a member impacts list.  */
-    getWorkingMemberImpactsList(memberId) {
+    /** This gets a editable copy of a impacts list.  
+     * @private */
+    _getWorkingImpactsList(memberId) {
         //make sure our working impacts map is populated
         //we will use this wile buildign the impacts map and then set the impacts map field
         if(!this.workingImpactsMap) {
@@ -482,7 +503,7 @@ export default class Model extends FieldObject {
         let childIdMap = this.getField("childIdMap");
         for(var name in childIdMap) {
             var childId = childIdMap[name];
-            let child = this.lookupMemberById(childId);
+            let child = this.lookupObjectById(childId);
             if(child) {
                 json.children[name] = child.toJson(this);
             }

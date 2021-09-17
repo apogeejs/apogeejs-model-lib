@@ -23,7 +23,7 @@ import {addActionInfo} from "/apogeejs-model-lib/src/actions/action.js";
 function deleteMember(model,actionData) {
     
     //get a new instance in case any changes are made during delete
-    let member = model.lookupMemberById(actionData.memberId);
+    let member = model.lookupObjectById(actionData.memberId);
     if(!member) {
         let actionResult = {};
         actionResult.actionDone = false;
@@ -34,8 +34,8 @@ function deleteMember(model,actionData) {
     let actionResult = doDelete(model, member);
 
     //remove the top-most deleted member from its parent
-    let parentId = member.getParentId();
-    let parent = model.getMutableMember(parentId);
+    let parent = model.getMutableParent(member.getParentId());
+
     if(parent) {
         parent.removeChild(model,member);
     }
@@ -62,7 +62,7 @@ function doDelete(model, member) {
         var childIdMap = member.getChildIdMap();
         for(var childName in childIdMap) {
             let childId = childIdMap[childName];
-            let child = model.lookupMemberById(childId);
+            let child = model.lookupObjectById(childId);
             if(child) {
                 let childActionResult = doDelete(model, child);
                 actionResult.childActionResults.push(childActionResult);

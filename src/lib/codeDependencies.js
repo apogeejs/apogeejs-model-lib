@@ -14,18 +14,27 @@ export function getDependencyInfo(varInfo,model,contextManager) {
         for(var i = 0; i < nameEntry.uses.length; i++) {
             var nameUse = nameEntry.uses[i];
             if(!nameUse.isLocal) {
-                //look up the object
-                var namePath = nameUse.path;
+                let impactorId
 
-                //lookup this object
-                var impactor = contextManager.getMember(model,namePath);
+                //look up the object
+                let namePath = nameUse.path;
+
+                if(nameEntry.scopeInjects) {
+                    if(nameEntry.scopeInjects.hasModelDependency) {
+                        impactorId = model.getId();
+                    }
+                }
+                else {
+                    //lookup this object
+                    let member = contextManager.getMember(model,namePath);
+                    if(member) impactorId = member.getId();
+                }
 
                 //add the impactor to the dependency map
-                if(impactor) {
+                if(impactorId) {
                     //add as dependent
-                    var memberId = impactor.getId();
-                    if(dependsOnMap[memberId] != true) {
-                        dependsOnMap[memberId] = true;
+                    if(dependsOnMap[impactorId] != true) {
+                        dependsOnMap[impactorId] = true;
                     }
                 }
             }

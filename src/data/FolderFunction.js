@@ -139,7 +139,7 @@ export default class FolderFunction extends DependentMember {
         let childIdMap = this.getChildIdMap();
         for(var name in childIdMap) {
             var childId = childIdMap[name];
-            let child = model.lookupMemberById(childId);
+            let child = model.lookupObjectById(childId);
             if((child)&&(child.isDependent)) {
                 child.updateDependeciesForModelChange(model,additionalUpdatedMembers);
             }
@@ -278,7 +278,7 @@ export default class FolderFunction extends DependentMember {
             if(actionResult.actionDone) {
                 //retrieve the result
                 if(returnValueMemberId) {
-                    let returnValueMember = instanceVirtualModel.lookupMemberById(returnValueMemberId);
+                    let returnValueMember = instanceVirtualModel.lookupObjectById(returnValueMemberId);
                     let returnState = returnValueMember.getState();
                     switch(returnState) {
                         case apogeeutil.STATE_NORMAL:

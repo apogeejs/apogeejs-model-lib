@@ -45,7 +45,7 @@ function moveMember(model,actionData) {
     else {
         targetParentId = member.getParentId();
     }
-    var targetParent = model.getMutableMember(targetParentId);
+    var targetParent = model.getMutableParent(targetParentId);
     if(!targetParent) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Parent not found for move member";
@@ -55,7 +55,7 @@ function moveMember(model,actionData) {
     //if the parent changes, remove this child from the parent
     //remove from old named object from the new or old parent - if it stays, we still have the new name
     let currentParentId = member.getParentId();
-    let currentParent = model.getMutableMember(currentParentId);
+    let currentParent = model.getMutableParent(currentParentId);
     if(currentParent.isParent) {
         currentParent.removeChild(model,member);
     }
@@ -97,7 +97,7 @@ function addChildResults(model,member) {
         var childIdMap = member.getChildIdMap();
         for(var childName in childIdMap) {
             var childId = childIdMap[childName];
-            let child = model.lookupMemberById(childId);
+            let child = model.lookupObjectById(childId);
             if(child) {
                 let childActionResult = {};
                 childActionResult.actionDone = true;

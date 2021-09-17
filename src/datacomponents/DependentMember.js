@@ -1,14 +1,9 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import Member from "/apogeejs-model-lib/src/datacomponents/Member.js";
 
-/** This mixin encapsulates an member whose value depends on on another
- * member. The dependent allows for a recalculation based on an update of the 
+/** This mixin encapsulates an member whose value depends on another
+ * member (or the model). The dependent allows for a recalculation based on an update of the 
  * objects it depends on.
- * 
- * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
- * 
- * COMPONENT DEPENDENCIES:
- * 
  */
 export default class DependentMember extends Member {
 
@@ -78,7 +73,11 @@ export default class DependentMember extends Member {
 
         let dependsOnMap = this.getField("dependsOnMap");
         for(var idString in dependsOnMap) {
-            let impactor = model.lookupMemberById(idString);
+            //model not applicable to state calc
+            if(idString == model.getId()) continue;
+
+            let impactor = model.lookupObjectById(idString);
+
             
             let impactorState = impactor.getState();
             if(impactorState == apogeeutil.STATE_ERROR) {
@@ -121,7 +120,7 @@ export default class DependentMember extends Member {
         //make sure dependencies are up to date
         let dependsOnMap = this.getField("dependsOnMap");
         for(var idString in dependsOnMap) {
-            let impactor = model.lookupMemberById(idString);
+            let impactor = model.lookupObjectById(idString);
             if((impactor.isDependent)&&(impactor.getCalcPending())) {
                 impactor.calculate(model);
             }

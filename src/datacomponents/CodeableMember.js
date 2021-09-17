@@ -6,20 +6,8 @@ import ContextHolder from "/apogeejs-model-lib/src/datacomponents/ContextHolder.
 import ContextManager from "/apogeejs-model-lib/src/lib/ContextManager.js";
 import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMember.js"
 
-/** This mixin encapsulates an object in that can be coded. It contains a function
- * and supplemental code. Object that are codeable should also be a member and
- * dependent.
- * 
- * This is a mixin and not a class. It is used in the prototype of the objects that inherit from it.
- * 
- * COMPONENT DEPENDENCIES: 
- * - A Codeable must be ContextHolder
- * 
- * FIELD NAMES (from update event):
- * - argList
- * - functionBody
- * - private
- */
+/** This class encapsulates an object in that can be coded. It contains a function, an argument list
+ * and supplemental (private) code. */
 export default class CodeableMember extends DependentMember {
 
     /** This initializes the component. Added arguments over member:
@@ -576,65 +564,50 @@ export default class CodeableMember extends DependentMember {
     
     /** This makes sure user code of object function is ready to execute.  */
     initializeMemberFunction(model) {
-        //we want to hold these as closure variables
-        let functionInitialized = false;
-        let functionInitializedSuccess = false;
-
-        let memberFunctionInitializer = () => {
-            
-            if(functionInitialized) return functionInitializedSuccess;
-            
-            //make sure this in only called once
-            if(this.dependencyInitInProgress) {
-                this.setError(model,"Circular reference error");
-                //clear calc in progress flag
-                this.dependencyInitInProgress = false;
-                functionInitialized = true;
-                functionInitializedSuccess = false;
-                return functionInitializedSuccess;
-            }
-            this.dependencyInitInProgress = true;
-            
-            try {
-                //make sure the data is set in each impactor
-                this.initializeImpactors(model);
-                this.calculateDependentState(model,true);
-                let state = this.getState();
-                if((state == apogeeutil.STATE_ERROR)||(state == apogeeutil.STATE_PENDING)||(state == apogeeutil.STATE_INVALID)) {
-                    //stop initialization if there is an issue in a dependent
-                    this.dependencyInitInProgress = false;
-                    functionInitialized = true;
-                    functionInitializedSuccess = false;
-                    return functionInitializedSuccess;
-                }
-                
-                //set the context
-                let compiledInfo = this.getField("compiledInfo");
-                let messenger = new Messenger(model,this);
-                compiledInfo.memberFunctionContextInitializer(model,this.getCodeContextManager(model),messenger);
-                
-                functionInitializedSuccess = true;
-            }
-            catch(error) {
-                //LATER NOTE - I think this is an internal error if we get an error here
-                //initializeImpactor will catch errors in user code of other members.
-                //the other function calls above should not throw errors, in theory
-                //investigate this more...
-                if(error.stack) {
-                    console.error(error.stack);
-                }
-
-                this.setError(model,error);
-                functionInitializedSuccess = false;
-            }
-            
+        //make sure this in only called once
+        if(this.dependencyInitInProgress) {
+            this.setError(model,"Circular reference error");
+            //clear calc in progress flag
             this.dependencyInitInProgress = false;
-            functionInitialized = true;
-            return functionInitializedSuccess;
+            return false;
         }
 
-        return memberFunctionInitializer();
+        this.dependencyInitInProgress = true;
+        try {
+            //make sure the data is set in each impactor
+            this.initializeImpactors(model);
+            this.calculateDependentState(model,true);
+            let state = this.getState();
+            if((state == apogeeutil.STATE_ERROR)||(state == apogeeutil.STATE_PENDING)||(state == apogeeutil.STATE_INVALID)) {
+                //stop initialization if there is an issue in a dependent
+                this.dependencyInitInProgress = false;
+                return false;
+            }
+            
+            //set the context
+            let compiledInfo = this.getField("compiledInfo");
+            let messenger = new Messenger(model,this);
+            compiledInfo.memberFunctionContextInitializer(model,this.getCodeContextManager(model),messenger);
+            
+            //successful init
+            this.dependencyInitInProgress = false;
+            return true;
+        }
+        catch(error) {
+            //LATER NOTE - I think this is an internal error if we get an error here
+            //initializeImpactor will catch errors in user code of other members.
+            //the other function calls above should not throw errors, in theory
+            //investigate this more...
+            if(error.stack) {
+                console.error(error.stack);
+            }
 
+            this.setError(model,error);
+
+            //failed init
+            this.dependencyInitInProgress = false;
+            return false;
+        }
     }
 
     //============================

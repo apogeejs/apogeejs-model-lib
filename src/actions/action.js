@@ -206,7 +206,7 @@ function internalDoAction(model,actionData) {
 
             //commit the updated impacts map (inverse of dependency map) 
             model.finalizeImpactsMap();
-            model.finalizeMemberMap();
+            model.finalizeObjectMap();
 
             //populate recalc list
             let recalculateList = createRecalculateList(model,actionModifiedMembers,additionalUpdatedMembers);

@@ -217,7 +217,20 @@ export const EXCLUSION_NAMES = {
     "Error": true,
     "RegExp": true,
     
-    "console": true
+    "console": true,
+
+    "__memberFunctionDebugHook": true,
+    "__customControlDebugHook": true
+
+}
+
+/** These are local values added to the scope of any model code. 
+ * 
+*/
+export const SCOPE_INJECTS = {
+    "apogeeMessenger": {
+        hasModelDependency: true
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -517,6 +530,10 @@ function processVariable(processInfo,node,isDeclaration,declarationKindInfo) {
         nameEntry = {};
         nameEntry.name = baseName;
         nameEntry.uses = [];
+
+        if(SCOPE_INJECTS[baseName]) {
+            nameEntry.scopeInjects = SCOPE_INJECTS[baseName];
+        }
         
         processInfo.nameTable[baseName] = nameEntry;
     }
