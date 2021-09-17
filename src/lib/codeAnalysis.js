@@ -224,13 +224,9 @@ export const EXCLUSION_NAMES = {
 
 }
 
-/** These are local values added to the scope of any model code. 
- * 
-*/
+/** These are local values added to the scope of any model code. */
 export const SCOPE_INJECTS = {
-    "apogeeMessenger": {
-        hasModelDependency: true
-    }
+    "apogeeMessenger": true
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -532,7 +528,7 @@ function processVariable(processInfo,node,isDeclaration,declarationKindInfo) {
         nameEntry.uses = [];
 
         if(SCOPE_INJECTS[baseName]) {
-            nameEntry.scopeInjects = SCOPE_INJECTS[baseName];
+            nameEntry.scopeInjects = true;
         }
         
         processInfo.nameTable[baseName] = nameEntry;

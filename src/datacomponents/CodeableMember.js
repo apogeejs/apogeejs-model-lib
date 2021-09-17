@@ -586,9 +586,13 @@ export default class CodeableMember extends DependentMember {
             
             //set the context
             let compiledInfo = this.getField("compiledInfo");
-            let messenger = new Messenger(model,this);
-            compiledInfo.memberFunctionContextInitializer(model,this.getCodeContextManager(model),messenger);
-            
+            compiledInfo.memberContextInitializer(model,this.getCodeContextManager(model));
+
+            if(this.usesMessenger(compiledInfo.varInfo)) {
+                let messenger = new Messenger(model,this);
+                compiledInfo.memberModelInitializer(messenger);
+            }
+
             //successful init
             this.dependencyInitInProgress = false;
             return true;
@@ -608,6 +612,12 @@ export default class CodeableMember extends DependentMember {
             this.dependencyInitInProgress = false;
             return false;
         }
+    }
+
+    /** This method returns true is the code refernces the apogee messenger. */
+    usesMessenger(varInfo) {
+        let messengerEntry = varInfo.apogeeMessenger;
+        return ((messengerEntry)&&(!messengerEntry.isLocal));
     }
 
     //============================

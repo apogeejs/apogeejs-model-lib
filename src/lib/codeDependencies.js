@@ -11,6 +11,8 @@ export function getDependencyInfo(varInfo,model,contextManager) {
 			
         //for each use of this name that is not local, find the referenced object
         var nameEntry = varInfo[baseName];
+        if(nameEntry.scopeInjects) continue; //ignore variables injected into code (like apogeeMessenger)
+
         for(var i = 0; i < nameEntry.uses.length; i++) {
             var nameUse = nameEntry.uses[i];
             if(!nameUse.isLocal) {
@@ -19,16 +21,9 @@ export function getDependencyInfo(varInfo,model,contextManager) {
                 //look up the object
                 let namePath = nameUse.path;
 
-                if(nameEntry.scopeInjects) {
-                    if(nameEntry.scopeInjects.hasModelDependency) {
-                        impactorId = model.getId();
-                    }
-                }
-                else {
-                    //lookup this object
-                    let member = contextManager.getMember(model,namePath);
-                    if(member) impactorId = member.getId();
-                }
+                //lookup this object
+                let member = contextManager.getMember(model,namePath);
+                if(member) impactorId = member.getId();
 
                 //add the impactor to the dependency map
                 if(impactorId) {

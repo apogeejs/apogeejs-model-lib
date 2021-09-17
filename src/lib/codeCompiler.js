@@ -82,7 +82,8 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
         //get the output functions
         var generatedFunctions = generatorFunction();
         compiledInfo.memberFunctionGenerator = generatedFunctions.memberGenerator;
-        compiledInfo.memberFunctionContextInitializer = generatedFunctions.initializer;  
+        compiledInfo.memberContextInitializer = generatedFunctions.contextInitializer; 
+        compiledInfo.memberModelInitializer =  generatedFunctions.modelInitializer; 
         compiledInfo.valid = true; 
         compiledInfo.generatorFunction = generatorFunction;                
     }
@@ -147,44 +148,38 @@ function createGeneratorBody(memberFunctionName,varInfo, combinedFunctionBody) {
     
     var contextDeclarationText = "";
     var initializerBody = "";
-
-    //add the messenger as a local variable
-    contextDeclarationText += "var apogeeMessenger";
-    initializerBody += "apogeeMessenger = __messenger";
     
     //set the context - here we only defined the variables that are actually used.
 	for(var baseName in varInfo) {        
         var baseNameInfo = varInfo[baseName];
         
         //do not add context variable for local or "returnValue", which is explicitly defined
-        if((baseName === "returnValue")||(baseNameInfo.isLocal)||(baseNameInfo.scopeInjects)) continue;
+        if((baseNameInfo.isLocal)||(baseNameInfo.scopeInjects)) continue;
         
         //add a declaration
-        contextDeclarationText += "\nvar " + baseName + ";";
+        contextDeclarationText += `\nvar ${baseName};`;
         
         //add to the context setter
-        initializerBody += '\n\t' + baseName + ' = __contextManager.getValue(__model,"' + baseName + '");';
+        initializerBody += `\n\t\t${baseName} = contextManager.getValue(model,"${baseName}");`;
     }
     
     //create the generator for the object function
     var generatorBody = `'use strict'
-//declare context variables
+//context variables
+var apogeeMessenger;
 ${contextDeclarationText}
 
-//context setter
-function __initializer(__model,__contextManager,__messenger) {
-    ${initializerBody}
-};
-
-//user code
-function __memberGenerator() {
+return {
+    'memberGenerator': function()  {
 ${combinedFunctionBody}
 return ${memberFunctionName}
-}
-
-return {
-    'memberGenerator': __memberGenerator,
-    'initializer': __initializer
+    },
+    'contextInitializer': function(model,contextManager) {
+${initializerBody}
+    },
+    'modelInitializer': function(messenger) {
+        apogeeMessenger = messenger;
+    }
 };
 `
     return generatorBody;    

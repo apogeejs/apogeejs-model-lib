@@ -73,11 +73,7 @@ export default class DependentMember extends Member {
 
         let dependsOnMap = this.getField("dependsOnMap");
         for(var idString in dependsOnMap) {
-            //model not applicable to state calc
-            if(idString == model.getId()) continue;
-
             let impactor = model.lookupObjectById(idString);
-
             
             let impactorState = impactor.getState();
             if(impactorState == apogeeutil.STATE_ERROR) {

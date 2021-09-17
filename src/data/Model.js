@@ -416,20 +416,20 @@ export default class Model extends FieldObject {
     //============================
 
     /** This returns an array of members this object impacts. */
-    getImpactsList(object) {
+    getImpactsList(member) {
         let impactsMap = this.getField("impactsMap");
-        let impactsList = impactsMap[object.getId()];
+        let impactsList = impactsMap[member.getId()];
         if(!impactsList) impactsList = [];
         return impactsList;
     }
     
     /** This method adds a member to the imapacts list for this object.
      * The return value is true if the member was added and false if it was already there. */
-    addToImpactsList(depedentMemberId,objectId) {
+    addToImpactsList(depedentMemberId,memberId) {
         //don't let a member impact itself
-        if(objectId === depedentMemberId) return;
+        if(memberId === depedentMemberId) return;
 
-        let workingImpactsList = this._getWorkingImpactsList(objectId);
+        let workingImpactsList = this._getWorkingImpactsList(memberId);
 
         //add to the list iff it is not already there
         if(workingImpactsList.indexOf(depedentMemberId) === -1) {
@@ -442,9 +442,9 @@ export default class Model extends FieldObject {
     }
 
     /** This method removes a member from the imapacts list for this object. */
-    removeFromImpactsList(depedentMemberId,objectId) {
+    removeFromImpactsList(depedentMemberId,memberId) {
 
-        let workingImpactsList = this._getWorkingImpactsList(objectId);
+        let workingImpactsList = this._getWorkingImpactsList(memberId);
 
         //it should appear only once
         for(var i = 0; i < workingImpactsList.length; i++) {
