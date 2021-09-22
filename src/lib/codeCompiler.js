@@ -76,13 +76,13 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
     var generatorBody = createGeneratorBody(memberFunctionName,compiledInfo.varInfo, combinedFunctionBody);
     try {
         //execute the generator function to get the member function generator
-        //and the memberFunctionContextInitializer
+        //and the memberScopeInitializer
         var generatorFunction = new Function(generatorBody);
 
         //get the output functions
         var generatedFunctions = generatorFunction();
         compiledInfo.memberFunctionGenerator = generatedFunctions.memberGenerator;
-        compiledInfo.memberContextInitializer = generatedFunctions.contextInitializer; 
+        compiledInfo.memberScopeInitializer = generatedFunctions.scopeInitializer; 
         compiledInfo.memberModelInitializer =  generatedFunctions.modelInitializer; 
         compiledInfo.valid = true; 
         compiledInfo.generatorFunction = generatorFunction;                
@@ -146,35 +146,35 @@ ${functionBody}
  * @private */
 function createGeneratorBody(memberFunctionName,varInfo, combinedFunctionBody) {
     
-    var contextDeclarationText = "";
+    var scopeDeclarationText = "";
     var initializerBody = "";
     
-    //set the context - here we only defined the variables that are actually used.
+    //set the scope - here we only defined the variables that are actually used.
 	for(var baseName in varInfo) {        
         var baseNameInfo = varInfo[baseName];
         
-        //do not add context variable for local or "returnValue", which is explicitly defined
+        //do not add scope variable for local or "returnValue", which is explicitly defined
         if((baseNameInfo.isLocal)||(baseNameInfo.scopeInjects)) continue;
         
         //add a declaration
-        contextDeclarationText += `\nvar ${baseName};`;
+        scopeDeclarationText += `\nvar ${baseName};`;
         
-        //add to the context setter
-        initializerBody += `\n\t\t${baseName} = contextManager.getValue(model,"${baseName}");`;
+        //add to the scope setter
+        initializerBody += `\n\t\t${baseName} = scopeManager.getValue(model,"${baseName}");`;
     }
     
     //create the generator for the object function
     var generatorBody = `'use strict'
-//context variables
+//scope variables
 var apogeeMessenger;
-${contextDeclarationText}
+${scopeDeclarationText}
 
 return {
     'memberGenerator': function()  {
 ${combinedFunctionBody}
 return ${memberFunctionName}
     },
-    'contextInitializer': function(model,contextManager) {
+    'scopeInitializer': function(model,scopeManager) {
 ${initializerBody}
     },
     'modelInitializer': function(messenger) {

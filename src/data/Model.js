@@ -1,7 +1,7 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import {EventManager,FieldObject} from "/apogeejs-base-lib/src/apogeeBaseLib.js";
-import ContextManager from "/apogeejs-model-lib/src/lib/ContextManager.js";
-import ContextHolder from "/apogeejs-model-lib/src/datacomponents/ContextHolder.js";
+import ScopeManager from "/apogeejs-model-lib/src/lib/ScopeManager.js";
+import ScopeHolder from "/apogeejs-model-lib/src/datacomponents/ScopeHolder.js";
 import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
 
 /** This is the model. 
@@ -17,8 +17,8 @@ export default class Model extends FieldObject {
 
         //mixin initialization
         this.eventManagerMixinInit();
-        //this is a root for the context
-        this.contextHolderMixinInit(true);
+        //this is a root for the scope
+        this.scopeHolderMixinInit(true);
         this.parentMixinInit(instanceToCopy,CHANGE_CHILDREN_WRITEABLE,DEFAULT_CHILDREN_WRITEABLE);
 
         this.runContext = runContext;
@@ -55,10 +55,11 @@ export default class Model extends FieldObject {
 
     /** This method returns a mutable copy of this instance. If the instance is already mutable
      * it will be returned rather than making a new one.  */
-    getMutableModel() {
+    getMutableModel(runContext) {
         if(this.getIsLocked()) {
             //create a new instance that is a copy of this one
-            let newModel = new Model(this.runContext,this);
+            let newModel = new Model(runContext,this);
+            runContext.registerModel(newModel);
 
             //update the object map for the new model
             let newObjectMap = {};
@@ -69,10 +70,20 @@ export default class Model extends FieldObject {
 
             return newModel;
         }
-        else {
-            //return this instance since it si already unlocked
+        else if(this.getRunContext() == runContext) {
+            //already unlocked
+            //we expect/require the run context should be the same. But test it and throw an error if it is not.
             return this;
         }
+        else {
+            throw new Error("Unknown run context change in model!");
+        }
+    }
+
+    /** This method checks if the passed run context is the one that is currently held in this model,
+     * returning true if so and false otherwise. */
+    getRunContext() {
+        return this.runContext;
     }
 
     /** This gets a copy of the model where any unlocked members are replaced with new instance copies.
@@ -84,6 +95,7 @@ export default class Model extends FieldObject {
         if(this.workingObjectMap) this.finalizeObjectMap();
 
         let newModel = new Model(newRunContext,this);
+        newRunContext.registerModel(newModel);
 
         //update the object map for the new model
         let oldObjectMap = this.getField("objectMap");
@@ -162,7 +174,7 @@ export default class Model extends FieldObject {
      * response to a json request completing.  */
     doFutureAction(actionData) {
         //run this action asynchronously
-        this.runContext.doAsynchActionCommand(this.getId(),actionData);
+        this.runContext.futureExecuteAction(this.getId(),actionData);
     }
 
     /** This method returns the root object - implemented from RootHolder.  */
@@ -262,22 +274,22 @@ export default class Model extends FieldObject {
     }
 
     //------------------------------
-    //ContextHolder methods
+    //ScopeHolder methods
     //------------------------------
 
-    /** This method retrieve creates the loaded context manager. */
-    createContextManager() {
-        //set the context manager
-        var contextManager = new ContextManager(this);
+    /** This method retrieve creates the loaded scope manager. */
+    createScopeManager() {
+        //set the scope manager
+        var scopeManager = new ScopeManager(this);
 
         //add an entry for this folder. This is for multiple folders in the model base
         //which as of the time of this comment we don't have but plan on adding
         //(at which time this comment will probably be left in by accident...)
         var myEntry = {};
-        myEntry.contextHolderAsParent = true;
-        contextManager.addToContextList(myEntry);
+        myEntry.scopeHolderAsParent = true;
+        scopeManager.addToScopeList(myEntry);
         
-        return contextManager;
+        return scopeManager;
     }
 
     //============================
@@ -322,7 +334,7 @@ export default class Model extends FieldObject {
      * mutable. This will throw an error if the model is not mutable. This is used in cases where the model
      * should already have been made mutable, such as from within an action. */
     getMutableParent(objectId) {
-        if(objectId = this.getId()) {
+        if(objectId == this.getId()) {
             if(this.getIsLocked()) {
                 throw new Error("The model is locked!");
             }
@@ -552,7 +564,7 @@ export default class Model extends FieldObject {
 
 //add mixins to this class
 apogeeutil.mixin(Model,EventManager);
-apogeeutil.mixin(Model,ContextHolder);
+apogeeutil.mixin(Model,ScopeHolder);
 apogeeutil.mixin(Model,Parent);
 
 const CHANGE_CHILDREN_WRITEABLE = false;

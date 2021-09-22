@@ -3,7 +3,7 @@ import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 /** This method takes the varInfo member from the code analysis and returns
  * a lit of member objects which this member depends on.
  */
-export function getDependencyInfo(varInfo,model,contextManager) {
+export function getDependencyInfo(varInfo,model,scopeManager) {
 	var dependsOnMap = {};
 	
 	//cycle through the variables used
@@ -22,7 +22,7 @@ export function getDependencyInfo(varInfo,model,contextManager) {
                 let namePath = nameUse.path;
 
                 //lookup this object
-                let member = contextManager.getMember(model,namePath);
+                let member = scopeManager.getMember(model,namePath);
                 if(member) impactorId = member.getId();
 
                 //add the impactor to the dependency map

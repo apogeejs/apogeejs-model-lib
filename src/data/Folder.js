@@ -1,8 +1,8 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import Model from "/apogeejs-model-lib/src/data/Model.js";
 import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMember.js";
-import ContextHolder from "/apogeejs-model-lib/src/datacomponents/ContextHolder.js";
-import ContextManager from "/apogeejs-model-lib/src/lib/ContextManager.js";
+import ScopeHolder from "/apogeejs-model-lib/src/datacomponents/ScopeHolder.js";
+import ScopeManager from "/apogeejs-model-lib/src/lib/ScopeManager.js";
 import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
 
 /** This is a folder. */
@@ -13,7 +13,7 @@ export default class Folder extends DependentMember {
 
         //mixin init where needed
         //This is not a root. Scope is inherited from the parent.
-        this.contextHolderMixinInit(false);
+        this.scopeHolderMixinInit(false);
         let instanceTypeConfig = this.getTypeConfig();
         this.parentMixinInit(instanceToCopy,instanceTypeConfig.changeChildrenWriteable,instanceTypeConfig.defaultChildrenWriteable);
     }
@@ -139,17 +139,17 @@ export default class Folder extends DependentMember {
     // Member Methods
     //------------------------------
 
-    /** This method retrieve creates the loaded context manager. */
-    createContextManager() {
-        //set the context manager
-        var contextManager = new ContextManager(this);
+    /** This method retrieve creates the loaded scope manager. */
+    createScopeManager() {
+        //set the scope manager
+        var scopeManager = new ScopeManager(this);
         
         //add an entry for this folder
         var myEntry = {};
-        myEntry.contextHolderAsParent = true;
-        contextManager.addToContextList(myEntry);
+        myEntry.scopeHolderAsParent = true;
+        scopeManager.addToScopeList(myEntry);
         
-        return contextManager;
+        return scopeManager;
     }
 
     //============================
@@ -194,7 +194,7 @@ export default class Folder extends DependentMember {
 
 
 //add components to this class                     
-apogeeutil.mixin(Folder,ContextHolder);
+apogeeutil.mixin(Folder,ScopeHolder);
 apogeeutil.mixin(Folder,Parent);
 
 /** This function creates a new instance */ 

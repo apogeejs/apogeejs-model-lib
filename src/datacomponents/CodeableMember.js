@@ -2,8 +2,8 @@ import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import Messenger from "/apogeejs-model-lib/src/actions/Messenger.js";
 import {processCode} from "/apogeejs-model-lib/src/lib/codeCompiler.js"; 
 import {getDependencyInfo} from "/apogeejs-model-lib/src/lib/codeDependencies.js";
-import ContextHolder from "/apogeejs-model-lib/src/datacomponents/ContextHolder.js";
-import ContextManager from "/apogeejs-model-lib/src/lib/ContextManager.js";
+import ScopeHolder from "/apogeejs-model-lib/src/datacomponents/ScopeHolder.js";
+import ScopeManager from "/apogeejs-model-lib/src/lib/ScopeManager.js";
 import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMember.js"
 
 /** This class encapsulates an object in that can be coded. It contains a function, an argument list
@@ -18,7 +18,7 @@ export default class CodeableMember extends DependentMember {
         super(name,instanceToCopy,typeConfig,specialCaseIdValue);
 
         //mixin init where needed. This is not a scoep root. Parent scope is inherited in this object
-        this.contextHolderMixinInit(false);
+        this.scopeHolderMixinInit(false);
         this.baseSetCodeOk = baseSetCodeOk;
         this.baseSetDataOk = baseSetDataOk;
         
@@ -114,7 +114,7 @@ export default class CodeableMember extends DependentMember {
         
         if((this.hasCode())&&(compiledInfo.valid)) {
             //set the dependencies
-            var dependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getCodeContextManager(model));
+            var dependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getCodeScopeManager(model));
             this.updateDependencies(model,dependsOnMap);
             
         }
@@ -132,7 +132,7 @@ export default class CodeableMember extends DependentMember {
                     
             //calculate new dependencies
             let oldDependsOnMap = this.getDependsOn();
-            let newDependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getCodeContextManager(model));
+            let newDependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getCodeScopeManager(model));
 
             if(!apogeeutil.jsonEquals(oldDependsOnMap,newDependsOnMap)) {
                 //if dependencies changes, make a new mutable copy and add this to 
@@ -359,11 +359,11 @@ export default class CodeableMember extends DependentMember {
             fields.noSave = noSave;
         }
 
-        //context parent generation
-        let contextParentGeneration = this.getField("contextParentGeneration");
-        if(contextParentGeneration) {
+        //scope parent generation
+        let scopeParentGeneration = this.getField("scopeParentGeneration");
+        if(scopeParentGeneration) {
             //save it if it is defined and not 0 (that is implicit default)
-            fields.contextParentGeneration = this.contextParentGeneration;
+            fields.scopeParentGeneration = this.scopeParentGeneration;
         }
 
         //fields locked
@@ -465,9 +465,9 @@ export default class CodeableMember extends DependentMember {
             this.setField("fieldsLocked",fieldsLocked);
         }
 
-        //read context parent, defaults to none if not in initial data.
-        if(initialFields.contextParentGeneration) {
-            this.setField("contextParentGeneration",initialFields.contextParentGeneration);
+        //read scope parent, defaults to none if not in initial data.
+        if(initialFields.scopeParentGeneration) {
+            this.setField("scopeParentGeneration",initialFields.scopeParentGeneration);
         }
 
         //apply initial fields data/argList/functionBody/supplementalCode
@@ -506,51 +506,51 @@ export default class CodeableMember extends DependentMember {
     }
 
     //------------------------------
-    //ContextHolder methods
+    //ScopeHolder methods
     //------------------------------
 
-    /** This method creates the context manager for this member. */
-    createContextManager() {
-        return new ContextManager(this);
+    /** This method creates the scope manager for this member. */
+    createScopeManager() {
+        return new ScopeManager(this);
     }
 
     //===================================
     // Protected Functions
     //===================================
 
-    /** This function just returns the context manager for the code for this object. 
-     * This is nominally the context manager for this object. However, There is an allowance
-     * to use a replacement for the context manager as used in the code.
+    /** This function just returns the scope manager for the code for this object. 
+     * This is nominally the scope manager for this object. However, There is an allowance
+     * to use a replacement for the scope manager as used in the code.
      * This is specifically intended for compound members where the end user is providing code,
      * such as through a form with expressions for input. In this case we want to code to be executed as
      * if it were on a different member. In the above menetioned case, the code should be from the parent page 
-     * where the user is entering the form data. To do this, the contextParentGeneration should be set to 
-     * the number of parent generations that should be used for the context member.
+     * where the user is entering the form data. To do this, the scopeParentGeneration should be set to 
+     * the number of parent generations that should be used for the scope member.
      */
-    getCodeContextManager(model) {
-        let contextMember;
-        let contextParentGeneration = this.getField("contextParentGeneration");
-        if(contextParentGeneration) {
-            contextMember = this.getRemoteContextMember(model,contextParentGeneration);
+    getCodeScopeManager(model) {
+        let scopeMember;
+        let scopeParentGeneration = this.getField("scopeParentGeneration");
+        if(scopeParentGeneration) {
+            scopeMember = this.getRemoteScopeMember(model,scopeParentGeneration);
         }
         else {
-            contextMember = this;
+            scopeMember = this;
         }
 
-        return contextMember.getContextManager();
+        return scopeMember.getScopeManager();
     }
 
-    /** This function is used to get a remote context member */
-    getRemoteContextMember(model,contextParentGeneration) {
-        let contextMember = this;
-        let parentCount = contextParentGeneration;
-        while((parentCount)&&(contextMember)) {
-            contextMember = contextMember.getParent(model);
+    /** This function is used to get a remote scope member */
+    getRemoteScopeMember(model,scopeParentGeneration) {
+        let scopeMember = this;
+        let parentCount = scopeParentGeneration;
+        while((parentCount)&&(scopeMember)) {
+            scopeMember = scopeMember.getParent(model);
             parentCount--;
         }
-        //if we have not context member, revert to the local object
-        if(!contextMember) contextMember = this;
-        return contextMember;
+        //if we have not scope member, revert to the local object
+        if(!scopeMember) scopeMember = this;
+        return scopeMember;
     }
 
     //===================================
@@ -584,12 +584,12 @@ export default class CodeableMember extends DependentMember {
                 return false;
             }
             
-            //set the context
+            //set the scope
             let compiledInfo = this.getField("compiledInfo");
-            compiledInfo.memberContextInitializer(model,this.getCodeContextManager(model));
+            compiledInfo.memberScopeInitializer(model,this.getCodeScopeManager(model));
 
             if(this.usesMessenger(compiledInfo.varInfo)) {
-                let messenger = new Messenger(model,this);
+                let messenger = new Messenger(model.getRunContext(),this.getId());
                 compiledInfo.memberModelInitializer(messenger);
             }
 
@@ -646,7 +646,7 @@ export default class CodeableMember extends DependentMember {
 }
 
 //add components to this class
-apogeeutil.mixin(CodeableMember,ContextHolder);
+apogeeutil.mixin(CodeableMember,ScopeHolder);
 
 
 //default optional settings values

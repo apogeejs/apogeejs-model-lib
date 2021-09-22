@@ -9,45 +9,45 @@
  * the search is then done in the parent of the member. This chain continues until we reach a "root" object,
  * an example of which is the model object itself.
  * 
- * The root object has a lookup like the other context manager objects, however, if a lookup fails
+ * The root object has a lookup like the other scope manager objects, however, if a lookup fails
  * to fins something, it does a lookup on global javascript variables. (Any filtering on this is TBD)
  * 
- * In the local scope for each context holder there is a context list, that allows for a number of entries. 
+ * In the local scope for each scope holder there is a scope list, that allows for a number of entries. 
  * Currently the only one type of entry - parent entry. It looks up children of the current object.
  * 
  * In the future we can add imports for the local scope, and potentially other lookup types. 
  * */
-export default function ContextManager(contextHolder) {
-    this.contextHolder = contextHolder;
+export default function ScopeManager(scopeHolder) {
+    this.scopeHolder = scopeHolder;
 
-    this.contextList = [];
+    this.scopeList = [];
 }
 
-ContextManager.prototype.addToContextList = function(entry) {
-    this.contextList.push(entry);
+ScopeManager.prototype.addToScopeList = function(entry) {
+    this.scopeList.push(entry);
 }
 
-ContextManager.prototype.removeFromContextList = function(entry) {
-    var index = this.contextList.indexOf(entry);
+ScopeManager.prototype.removeFromScopeList = function(entry) {
+    var index = this.scopeList.indexOf(entry);
     if(index >= 0) {
-        this.contextList.splice(index,1);
+        this.scopeList.splice(index,1);
     }
 }
 
-ContextManager.prototype.clearContextList = function() {
-    this.contextList = [];
+ScopeManager.prototype.clearScopeList = function() {
+    this.scopeList = [];
 }
 
-ContextManager.prototype.getValue = function(model,varName) {
+ScopeManager.prototype.getValue = function(model,varName) {
     var data = this.lookupValue(model,varName);
     
-    //if the name is not in this context, check with the parent context
+    //if the name is not in this scope, check with the parent scope
     if(data === undefined) {
-        if((this.contextHolder)&&(!this.contextHolder.getIsScopeRoot())) {
-            var parent = this.contextHolder.getParent(model);
+        if((this.scopeHolder)&&(!this.scopeHolder.getIsScopeRoot())) {
+            var parent = this.scopeHolder.getParent(model);
             if(parent) {
-                var parentContextManager = parent.getContextManager();
-                data = parentContextManager.getValue(model,varName);
+                var parentScopeManager = parent.getScopeManager();
+                data = parentScopeManager.getValue(model,varName);
             }
         }
     }
@@ -55,17 +55,17 @@ ContextManager.prototype.getValue = function(model,varName) {
     return data;
 }
 
-ContextManager.prototype.getMember = function(model,pathArray) {
+ScopeManager.prototype.getMember = function(model,pathArray) {
     let index = 0;
     var impactor = this.lookupMember(model,pathArray,index);
     
-    //if the object is not in this context, check with the parent context
+    //if the object is not in this scope, check with the parent scope
     if(!impactor) {
-        if((this.contextHolder)&&(!this.contextHolder.getIsScopeRoot())) {
-            var parent = this.contextHolder.getParent(model);
+        if((this.scopeHolder)&&(!this.scopeHolder.getIsScopeRoot())) {
+            var parent = this.scopeHolder.getParent(model);
             if(parent) {
-                var parentContextManager = parent.getContextManager();
-                impactor = parentContextManager.getMember(model,pathArray);
+                var parentScopeManager = parent.getScopeManager();
+                impactor = parentScopeManager.getMember(model,pathArray);
             }
         }
     }
@@ -77,15 +77,15 @@ ContextManager.prototype.getMember = function(model,pathArray) {
 // Private Methods
 //==================================
 
-/** Check each entry of the context list to see if the data is present. */
-ContextManager.prototype.lookupValue = function(model,varName) {
+/** Check each entry of the scope list to see if the data is present. */
+ScopeManager.prototype.lookupValue = function(model,varName) {
     var data;
     let childFound = false;
-    for(var i = 0; i < this.contextList.length; i++) {
-        var entry = this.contextList[i];        
-        if(entry.contextHolderAsParent) {
+    for(var i = 0; i < this.scopeList.length; i++) {
+        var entry = this.scopeList[i];        
+        if(entry.scopeHolderAsParent) {
             //for parent entries, look up the child and read the data
-            var child = this.contextHolder.lookupChild(model,varName);
+            var child = this.scopeHolder.lookupChild(model,varName);
             if(child) {
                 data = child.getData();
                 childFound = true;
@@ -95,7 +95,7 @@ ContextManager.prototype.lookupValue = function(model,varName) {
         if(childFound) return data;
     }
 
-    if(this.contextHolder.getIsScopeRoot()) {
+    if(this.scopeHolder.getIsScopeRoot()) {
         data = this.getValueFromGlobals(varName);
 
         if(data != undefined) {
@@ -106,16 +106,16 @@ ContextManager.prototype.lookupValue = function(model,varName) {
     return undefined;
 }
 
-ContextManager.prototype.lookupMember = function(model,pathArray,index) {
+ScopeManager.prototype.lookupMember = function(model,pathArray,index) {
     var impactor;
-    for(var i = 0; i < this.contextList.length; i++) {
-        var entry = this.contextList[i];        
-        if(entry.contextHolderAsParent) {
+    for(var i = 0; i < this.scopeList.length; i++) {
+        var entry = this.scopeList[i];        
+        if(entry.scopeHolderAsParent) {
             //for parent entries, look up the child and read the data
-            impactor = this.contextHolder.lookupChild(model,pathArray[index]);
+            impactor = this.scopeHolder.lookupChild(model,pathArray[index]);
 
-            if((impactor)&&(impactor.isContextHolder)) {
-                let childImpactor = impactor.getContextManager().lookupMember(model,pathArray,index+1);
+            if((impactor)&&(impactor.isScopeHolder)) {
+                let childImpactor = impactor.getScopeManager().lookupMember(model,pathArray,index+1);
                 if(childImpactor) {
                     impactor = childImpactor;
                 }
@@ -130,7 +130,7 @@ ContextManager.prototype.lookupMember = function(model,pathArray,index) {
     return undefined;
 }
 
-ContextManager.prototype.getValueFromGlobals = function(varName) {
+ScopeManager.prototype.getValueFromGlobals = function(varName) {
     ///////////////////////////////////
     //CLUDGE - Here we can added additional values that are not in globals
     //This is here because, for now, on the server require did not appear in globals, so we put it here.

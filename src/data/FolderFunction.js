@@ -1,10 +1,11 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import {doAction} from "/apogeejs-model-lib/src/actions/action.js";
 import Model from "/apogeejs-model-lib/src/data/Model.js";
-import ContextManager from "/apogeejs-model-lib/src/lib/ContextManager.js";
+import ScopeManager from "/apogeejs-model-lib/src/lib/ScopeManager.js";
 import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMember.js";
-import ContextHolder from "/apogeejs-model-lib/src/datacomponents/ContextHolder.js";
+import ScopeHolder from "/apogeejs-model-lib/src/datacomponents/ScopeHolder.js";
 import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
+import BaseRunContext from "/apogeejs-model-lib/src/actions/BaseRunContext.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
@@ -14,7 +15,7 @@ export default class FolderFunction extends DependentMember {
         super(name,instanceToCopy,typeConfig,specialCaseIdValue);
 
         //mixin init where needed
-        this.contextHolderMixinInit();
+        this.scopeHolderMixinInit();
         this.parentMixinInit(instanceToCopy,false,false);
 
         //==============
@@ -147,20 +148,20 @@ export default class FolderFunction extends DependentMember {
     }
 
     //------------------------------
-    //ContextHolder methods
+    //ScopeHolder methods
     //------------------------------
 
-    /** This method retrieve creates the loaded context manager. */
-    createContextManager() {
-        //set the context manager
-        var contextManager = new ContextManager(this);
+    /** This method retrieve creates the loaded scope manager. */
+    createScopeManager() {
+        //set the scope manager
+        var scopeManager = new ScopeManager(this);
         
         //add an entry for this folder
         var myEntry = {};
-        myEntry.contextHolderAsParent = true;
-        contextManager.addToContextList(myEntry);
+        myEntry.scopeHolderAsParent = true;
+        scopeManager.addToScopeList(myEntry);
         
-        return contextManager;
+        return scopeManager;
     }
 
     //------------------------------
@@ -239,7 +240,7 @@ export default class FolderFunction extends DependentMember {
                 //prepare the virtual function
                 //this is a copy of the original model, but with any member that is unlocked replaced.
                 //to prevent us from modifying an object in use by our current real model calculation.
-                baseVirtualModel = model.getCleanCopy(DUMMY_RUN_CONTEXT);
+                baseVirtualModel = model.getCleanCopy(new DUMMY_RUN_CONTEXT());
 
                 //we want to set the folder function as "sterilized" - this prevents any downstream work from the folder function updating
                 //(this is an synchronous command)
@@ -273,7 +274,7 @@ export default class FolderFunction extends DependentMember {
             actionData.actions = updateActionList;
 
             //apply the update
-            let instanceVirtualModel = baseVirtualModel.getMutableModel();
+            let instanceVirtualModel = baseVirtualModel.getMutableModel(DUMMY_RUN_CONTEXT);
             var actionResult = doAction(instanceVirtualModel,actionData);        
             if(actionResult.actionDone) {
                 //retrieve the result
@@ -359,7 +360,7 @@ export default class FolderFunction extends DependentMember {
 }
 
 //add components to this class
-apogeeutil.mixin(FolderFunction,ContextHolder);
+apogeeutil.mixin(FolderFunction,ScopeHolder);
 apogeeutil.mixin(FolderFunction,Parent);
 
 FolderFunction.INTERNAL_FOLDER_NAME = "body";
@@ -395,74 +396,19 @@ Model.registerTypeConfig(TYPE_CONFIG);
  * The usual function of the run context is to provide the proper instance 
  * of the model when an asynch command is run.
  */
-const DUMMY_RUN_CONTEXT = {
-    doAsynchActionCommand: function(modelId,actionData) {
+class DUMMY_RUN_CONTEXT extends BaseRunContext {  
+
+    getConfirmedModel() {
         throw new Error("There should be no asych functions in this context!");
     }
-}
+
+    futureExecuteAction(modelId,actionData) {
+        throw new Error("There should be no asych functions in this context!");
+    }
 
 
-//we will need to rethink this
-// /** This is used when the return value is pending. */
-// getReturnPromise(activeModelWrapper,returnValueMemberId) {
-//     let promiseCompleteFunction;
-//     let promise = new Promise( (resolve,reject) => {
-//         promiseCompleteFunction = member => {
-//             if(member.getId() == returnValueMemberId) {
-//                 let memberState = member.getState();
-//                 if(memberState == apogeeutil.STATE_ERROR) {
-//                     //error
-//                     reject(member.getErrorMsg());
-//                 }
-//                 else if(memberState == apogeeutil.STATE_PENDING) {
-//                     //just wait for resolution
-//                 }
-//                 else if(memberstate == apogeeutil.STATE_INVALID) {
-//                     //maybe not really what we want
-//                     return INVALID_VALUE;
-//                 }
-//                 else {
-//                     //good data
-//                     return member.getData();
-//                 }
-//             }
-//         }
-//     });
-//     //add listener fro promise
-//     activeModelWrapper.addUpdateListener(promiseCompleteFunction);
-//     return promise;
-// }
+};
 
-
-    //===============================
-    // Virtual Context
-    //===============================
-
-//we will need to rethink this
-// function getNewInstanceContext(model) {
-//     //this is needed to execute an action asynchronously
-//     // let virtualRunContext = {};
-//     // virtualRunContext.doAsynchActionCommand = (modelId,action) => {
-//     //     setTimeout( () => {
-//     //         activeVirtualModel = activeVirtualModel.getMutableModel();
-//     //         activeVirtualModel.addListener("member_updated", updateListener);
-//     //         doAction(activeVirtualModel,actionData); 
-//     //     })
-//     // }
-
-//     let activeVirtualModel = model.getCleanModelCopy(virtualRunContext);
-//     let updateListener;
-
-//     //this manages the active copy of the model
-//     let instanceContext = {
-//         getMutableModel: () => {
-//             activeVirtualModel = activeVirtualModel.getMutableModel();
-//             return activeVirtualModel;
-//         }
-//     }
-
-//     return instanceContext;
-// }
 
 
 

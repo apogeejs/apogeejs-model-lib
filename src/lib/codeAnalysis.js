@@ -201,7 +201,7 @@ export const KEYWORDS = {
 	"yield": true,
 };
 
-/** These are variable names we will not call out in setting the context.
+/** These are variable names we will not initialize for the member code scope.
  * NOTE - it is OK if we do not exclude a global variable. It will still work. */
 export const EXCLUSION_NAMES = {
     "undefined": true,
