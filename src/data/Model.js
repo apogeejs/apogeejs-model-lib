@@ -5,13 +5,15 @@ import ScopeHolder from "/apogeejs-model-lib/src/datacomponents/ScopeHolder.js";
 import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
 
 /** This is the model. 
- * -instanceToCopy - if the new instance should be a copy of an existing instance, this
+ * - runContextLink - The link to the run context is needed to execute commands against future versions of the model
+ * such as with asynch actions (and also for the messenger). 
+ * - instanceToCopy - if the new instance should be a copy of an existing instance, this
  * argument should be populated. The copy will have the same field values but it will be unlocked 
  * and by default the update fields will be cleared. The event listeners are also cleared.
  * */
 export default class Model extends FieldObject {
 
-    constructor(runContext,instanceToCopy) {
+    constructor(runContextLink,instanceToCopy) {
         //base init
         super("model",instanceToCopy);
 
@@ -21,7 +23,8 @@ export default class Model extends FieldObject {
         this.scopeHolderMixinInit(true);
         this.parentMixinInit(instanceToCopy,CHANGE_CHILDREN_WRITEABLE,DEFAULT_CHILDREN_WRITEABLE);
 
-        this.runContext = runContext;
+        this.runContextLink = runContextLink;
+        runContextLink.registerModel(this);
 
         //==============
         //Fields
@@ -55,11 +58,10 @@ export default class Model extends FieldObject {
 
     /** This method returns a mutable copy of this instance. If the instance is already mutable
      * it will be returned rather than making a new one.  */
-    getMutableModel(runContext) {
+    getMutableModel(runContextLink) {
         if(this.getIsLocked()) {
             //create a new instance that is a copy of this one
-            let newModel = new Model(runContext,this);
-            runContext.registerModel(newModel);
+            let newModel = new Model(runContextLink,this);
 
             //update the object map for the new model
             let newObjectMap = {};
@@ -70,7 +72,7 @@ export default class Model extends FieldObject {
 
             return newModel;
         }
-        else if(this.getRunContext() == runContext) {
+        else if(this.getRunContextLink() == runContextLink) {
             //already unlocked
             //we expect/require the run context should be the same. But test it and throw an error if it is not.
             return this;
@@ -82,20 +84,19 @@ export default class Model extends FieldObject {
 
     /** This method checks if the passed run context is the one that is currently held in this model,
      * returning true if so and false otherwise. */
-    getRunContext() {
-        return this.runContext;
+    getRunContextLink() {
+        return this.runContextLink;
     }
 
     /** This gets a copy of the model where any unlocked members are replaced with new instance copies.
      * This ensures if we look up a mutable member from here we get a different instance from what was 
      * in our original model instance. */
-    getCleanCopy(newRunContext) {
+    getCleanCopy(newRunContextLink) {
         //make sure the stored fields are up to date
         if(this.workingImpactsMap) this.finalizeImpactsMap();
         if(this.workingObjectMap) this.finalizeObjectMap();
 
-        let newModel = new Model(newRunContext,this);
-        newRunContext.registerModel(newModel);
+        let newModel = new Model(newRunContextLink,this);
 
         //update the object map for the new model
         let oldObjectMap = this.getField("objectMap");
@@ -174,7 +175,7 @@ export default class Model extends FieldObject {
      * response to a json request completing.  */
     doFutureAction(actionData) {
         //run this action asynchronously
-        this.runContext.futureExecuteAction(this.getId(),actionData);
+        this.runContextLink.futureExecuteAction(this.getId(),actionData);
     }
 
     /** This method returns the root object - implemented from RootHolder.  */

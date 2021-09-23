@@ -4,10 +4,18 @@
 export default class Messenger {
     
     /** 
-     * model - the model from which this is called.
-     * fromOjbect - the reference member from which this is called or, if no reference, the model object. */
-    constructor(runContext,fromObjectId) {
-        this.runContext = runContext;
+     * runContextLink - reference to the run context for the model sequence this massenger will call against.
+     * fromOjbectId - the reference member from which this is called or, if no reference, the model object. If this argument
+     *     is omitted the model is assumed. */
+    constructor(runContextLink,fromObjectId) {
+        this.runContextLink = runContextLink;
+        if(!fromObjectId) {
+            let model = this.runContextLink.getCurrentModel();
+            if(model) {
+                //(model will only be invalid, potentially, after we terminate the run context)
+                fromObjectId = model.getId();
+            }
+        }
         this.fromObjectId = fromObjectId;
     }
 
@@ -19,6 +27,8 @@ export default class Messenger {
      * These updates are applied after the current calculation is completed. See documentation
      * for more information on the messenger. */
     dataUpdate(updateMemberName,data) {
+        if(!this.runContextLink.getIsActive()) return;
+
         var member = this._getMemberObject(updateMemberName);
         if(!member) {
             throw new Error("Error calling messenger - member not fond: " + updateMemberName);
@@ -30,7 +40,7 @@ export default class Messenger {
         actionData.memberId = member.getId();
         actionData.data = data;
 
-        this.runContext.executeAction(actionData);
+        this.runContextLink.executeAction(actionData);
     }
 
     /** This is similar to dataUpdate except is allows multiple values to be set.
@@ -38,6 +48,8 @@ export default class Messenger {
      * data update. Each element shoudl be a 2-element array with the first entry being
      * the member name and the second being the data value. */
     compoundDataUpdate(updateInfo) { 
+        if(!this.runContextLink.getIsActive()) return;
+
         //make the action list
         var actionList = [];
         for(var i = 0; i < updateInfo.length; i++) {
@@ -64,7 +76,7 @@ export default class Messenger {
         actionData.action = "compoundAction";
         actionData.actions = actionList;
 
-        this.runContext.executeAction(actionData);
+        this.runContextLink.executeAction(actionData);
     }
     
     //=====================
@@ -74,7 +86,7 @@ export default class Messenger {
     /** This method returns the member instance for a given local member name,
      * as defined from the source object context. */
     _getMemberObject(localMemberName) { 
-        let currentModel = this.runContext.getCurrentModel();
+        let currentModel = this.runContextLink.getCurrentModel();
         let fromObject = currentModel.lookupObjectById(this.fromObjectId);
         if(!fromObject) {
             throw new Error("Error calling messenger - source member not found!")

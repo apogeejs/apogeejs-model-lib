@@ -589,7 +589,7 @@ export default class CodeableMember extends DependentMember {
             compiledInfo.memberScopeInitializer(model,this.getCodeScopeManager(model));
 
             if(this.usesMessenger(compiledInfo.varInfo)) {
-                let messenger = new Messenger(model.getRunContext(),this.getId());
+                let messenger = new Messenger(model.getRunContextLink(),this.getId());
                 compiledInfo.memberModelInitializer(messenger);
             }
 

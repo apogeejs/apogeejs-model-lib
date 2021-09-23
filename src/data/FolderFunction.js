@@ -5,7 +5,7 @@ import ScopeManager from "/apogeejs-model-lib/src/lib/ScopeManager.js";
 import DependentMember from "/apogeejs-model-lib/src/datacomponents/DependentMember.js";
 import ScopeHolder from "/apogeejs-model-lib/src/datacomponents/ScopeHolder.js";
 import Parent from "/apogeejs-model-lib/src/datacomponents/Parent.js";
-import BaseRunContext from "/apogeejs-model-lib/src/actions/BaseRunContext.js";
+import ModelRunContextLink from "/apogeejs-model-lib/src/actions/ModelRunContextLink.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
@@ -240,7 +240,9 @@ export default class FolderFunction extends DependentMember {
                 //prepare the virtual function
                 //this is a copy of the original model, but with any member that is unlocked replaced.
                 //to prevent us from modifying an object in use by our current real model calculation.
-                baseVirtualModel = model.getCleanCopy(new DUMMY_RUN_CONTEXT());
+                let initRunContext = createRunContext();
+                let initRunContextLink = createRunContextLink(initRunContext);
+                baseVirtualModel = model.getCleanCopy(initRunContextLink);
 
                 //we want to set the folder function as "sterilized" - this prevents any downstream work from the folder function updating
                 //(this is an synchronous command)
@@ -251,10 +253,16 @@ export default class FolderFunction extends DependentMember {
                 commandData.fieldValue = "true";
                 let actionResult = doAction(baseVirtualModel,commandData);
 
+                //clean up the run context
                 //we should do something with the action result
                 if(!actionResult.actionDone) {
+                    initRunContextLink.setStateValid(false);
                     throw new Error("Error calculating folder function");
                 }
+                else {
+                    initRunContextLink.setStateValid(true);
+                }
+                initRunContext.deactivate();
                 
                 initialized = true;
             }
@@ -273,10 +281,18 @@ export default class FolderFunction extends DependentMember {
             actionData.action = "compoundAction";
             actionData.actions = updateActionList;
 
+            //create the run context for this 
+            let functionCallRunContext = createRunContext();
+            let runContextLink = createRunContextLink(functionCallRunContext);
+
             //apply the update
-            let instanceVirtualModel = baseVirtualModel.getMutableModel(DUMMY_RUN_CONTEXT);
+            let instanceVirtualModel = baseVirtualModel.getMutableModel(runContextLink);
             var actionResult = doAction(instanceVirtualModel,actionData);        
             if(actionResult.actionDone) {
+                //do the run context update
+                runContextLink.setStateValid(true);
+                functionCallRunContext.deactivate();
+
                 //retrieve the result
                 if(returnValueMemberId) {
                     let returnValueMember = instanceVirtualModel.lookupObjectById(returnValueMemberId);
@@ -306,6 +322,10 @@ export default class FolderFunction extends DependentMember {
                 }
             }
             else {
+                //do the run context update
+                runContextLink.setStateValid(false);
+                functionCallRunContext.deactivate();
+
                 let errorMsg = actionResult.errorMsg ? actionResult.errorMsg : "Unknown error evaluating Folder Function " + this.getName();
                 throw new Error(errorMsg);
             }
@@ -391,24 +411,44 @@ Model.registerTypeConfig(TYPE_CONFIG);
 
 
 //////////////////////////////////////////////////////////////////
+// These are dummy implementions of the run context for Folder Functions
+// For now we do not allow async folder funtions. We will add that though!!!
 
-/** This is a dummy trun context. It does not allow asynch functions.
- * The usual function of the run context is to provide the proper instance 
- * of the model when an asynch command is run.
- */
-class DUMMY_RUN_CONTEXT extends BaseRunContext {  
+function createRunContext() {
+    return new FolderFunctionRunContext();
+}
+
+function createRunContextLink(runContext) {
+    return new ModelRunContextLink(runContext);
+}
+
+/** This is a dummy run context. It does not allow async functions. */
+ class FolderFunctionRunContext {
+    constructor() {
+        this.isActive = true;
+    }
+
+    /** This method should return true if the run context is active and false if it has been stopped. For example, if an application
+     * is the run context and it has been closed, this should return false.
+     */
+     getIsActive() {
+        return this.isActive;
+    }
+    
+    deactivate() {
+        this.isActive = false;
+    }
 
     getConfirmedModel() {
-        throw new Error("There should be no asych functions in this context!");
+        return null;
     }
 
     futureExecuteAction(modelId,actionData) {
-        throw new Error("There should be no asych functions in this context!");
+        throw new Error("Async actions not allowed in folder function for now!");
     }
 
 
 };
-
 
 
 
