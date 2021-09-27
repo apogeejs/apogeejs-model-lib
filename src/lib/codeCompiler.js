@@ -3,10 +3,9 @@ import {KEYWORDS, EXCLUSION_NAMES, analyzeCode} from "/apogeejs-model-lib/src/li
 /** @private */
 const APOGEE_FORBIDDEN_NAMES = {
     "apogeeMessenger": true,
-    "__initializer": true,
-    "__memberFunction": true,
-    "__memberGenerator": true,
-    "__memberFunctionDebugHook": true
+    "__memberFunctionDebugHook": true,
+    "__customControlDebugHook": true,
+    "__functionMemberWrapper": true
 }
 
 /** This test for a valid member name, including tests for excluded names.  

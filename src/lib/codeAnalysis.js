@@ -220,7 +220,8 @@ export const EXCLUSION_NAMES = {
     "console": true,
 
     "__memberFunctionDebugHook": true,
-    "__customControlDebugHook": true
+    "__customControlDebugHook": true,
+    "__memberFunctionDebugHook": true
 
 }
 
