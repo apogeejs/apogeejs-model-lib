@@ -31,20 +31,17 @@ const syntax = {
     ArrowFunctionExpression: [
         {name:'params',list:true,declaration:true},
         {name:'body'},
-        //no supporting default functions values  {name:'defaults',list:true}
     ],
     BlockStatement: [{name:'body',list:true}],
     BinaryExpression: [
         {name:'left'},
         {name:'right'}
-        //I'm not sure I know all of these. Some may modify the object but we will skip that check here
     ],         
     BreakStatement: [],
     CallExpression: [{name:'callee'},{name:'arguments',list:true}],
     CatchClause: [
         {name:'param',declaration:true},
         {name:'body'}
-        //guards omitted - moz specific
     ],
     ConditionalExpression: [{name:'test'},{name:'alternate'},{name:'consequent'}],
     ContinueStatement: [],
@@ -59,13 +56,11 @@ const syntax = {
         {name:'id',declaration:true},
         {name:'params',list:true,declaration:true},
         {name:'body'}
-        //no supporting default functions values
     ],
     FunctionExpression: [
         {name:'id',declaration:true},
         {name:'params',list:true,declaration:true},
         {name:'body'}
-        //no supporting default functions values
     ],
     Identifier: [], //this is handled specially
     IfStatement: [{name:'test'},{name:'consequent'},{name:'alternate'}],
@@ -93,12 +88,9 @@ const syntax = {
         {name:'block'},
         {name:'handler'},
         {name:'finalizer',list:true}
-        //guards omitted, moz specific
     ],
     UnaryExpression: [
         {name:'argument'}
-        //the delete operator modifies, but we will skip that error check here
-        //"-" | "+" | "!" | "~" | "typeof" | "void" | "delete"
     ],
     UpdateExpression: [{identifierNode:'argument'}],
     VariableDeclaration: [{name:'declarations',list:true,declaration:true}],
@@ -107,10 +99,7 @@ const syntax = {
     WithStatement: [{name:'object'},{name:'body'}],
     YieldExpression: [
         {name:'argument'}
-        //moz spidermonkey specific
     ],
-
-    
 
     //no support
     ClassBody: null, //class related
