@@ -28,7 +28,11 @@ const syntax = {
     AssignmentPattern: [{name:'left'},{name:'right'}],
     ArrayExpression: [{name:'elements',list:true}],
     ArrayPattern: [{name:'elements',list:true}],
-    ArrowFunctionExpression: [{name:'params',list:true,declaration:true},{name:'body'},{name:'defaults',list:true}],
+    ArrowFunctionExpression: [
+        {name:'params',list:true,declaration:true},
+        {name:'body'},
+        //no supporting default functions values  {name:'defaults',list:true}
+    ],
     BlockStatement: [{name:'body',list:true}],
     BinaryExpression: [
         {name:'left'},
@@ -376,7 +380,7 @@ function processTreeNode(processInfo,node,isDeclaration,declarationKindInfo) {
         //process a variable
         processVariable(processInfo,node,isDeclaration,declarationKindInfo);
     } 
-    else if((node.type == "FunctionDeclaration")||(node.type == "FunctionExpression")) {
+    else if((node.type == "FunctionDeclaration")||(node.type == "FunctionExpression")||(node.type == "ArrowFunctionExpression")) {
         //process the functoin
         processFunction(processInfo,node); 
     }
@@ -471,13 +475,17 @@ function processFunction(processInfo,node) {
     var scope = startScope(processInfo,FUNCTION_SCOPE);
     
     if((nodeType === "FunctionExpression")&&(idNode)) {
-        //parse id node (variable name) in the parent scope
+        //parse id node (variable name) in the function scope
         processTreeNode(processInfo,idNode,true);
     }
+
+    //no id node (name) for arrow functions
     
     //process the variable list
-    for(var i = 0; i < params.length; i++) {
-        processTreeNode(processInfo,params[i],true);
+    if(params) {
+        for(var i = 0; i < params.length; i++) {
+            processTreeNode(processInfo,params[i],true);
+        }
     }
     
     //process the function body
