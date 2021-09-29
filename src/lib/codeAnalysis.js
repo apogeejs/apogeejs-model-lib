@@ -70,7 +70,7 @@ const syntax = {
     MemberExpression: [], //this handled specially
     NewExpression: [{name:'callee'},{name:'arguments',list:true}],
     Program: [{name:'body',list:true}],
-    Property: [{name:'key'},{name:'value'}], //this is handled specially
+    Property: [/*{name:'key'},*/{name:'value'}], //ignore the key, this will not be a variable - but espira does call it an identifier if it is written without quotes
     ReturnStatement: [{name:'argument'}],
     RestElement: [{name:'argument'}],
     SequenceExpression: [{name:'expressions',list:true}],
@@ -97,11 +97,9 @@ const syntax = {
     VariableDeclarator: [{name:'id',declaration:true},{name:'init'}],
     WhileStatement: [{name:'body'},{name:'test',list:true}],
     WithStatement: [{name:'object'},{name:'body'}],
-    YieldExpression: [
-        {name:'argument'}
-    ],
 
     //no support
+    AwaitExpression: null, //oops - Using this is OK because it still actually works synchronously, but I'm leaving it out since it might be confusing. 
     ClassBody: null, //class related
     ClassDeclaration: null, //class related
     ClassExpression: null, //class related
@@ -115,7 +113,8 @@ const syntax = {
     ImportSpecifier: null, //module related
     MetaProperty: null, //class related
     MethodDefinition: null, //class related
-    Super: null //class related
+    Super: null, //class related
+    YieldExpression: []//null //asynch we want to avoid
 
     //if we allowed module import, it would look like this I think
     //but we can not do this in a function, only a module
@@ -131,6 +130,8 @@ const syntax = {
 export const KEYWORDS = {
 	"abstract": true,
 	"arguments": true,
+    "async": true,
+    "await": true,
 	"boolean": true,
 	"break": true,
 	"byte": true,
@@ -212,9 +213,16 @@ export const EXCLUSION_NAMES = {
     
     "console": true,
 
+    //global fucntions/values
     "__memberFunctionDebugHook": true,
     "__customControlDebugHook": true,
-    "__memberFunctionDebugHook": true
+    "__memberFunctionDebugHook": true,
+    "__globals__": true,
+
+    //used in code compiler
+    "__model": true,
+    "__scopeManager": true,
+    "__messenger": true
 
 }
 
@@ -242,6 +250,8 @@ export const SCOPE_INJECTS = {
  * an exception if there is an error parsing.
  **/
 export function analyzeCode(functionText) {
+
+    console.log(functionText);
 
     var returnValue = {};
     
@@ -314,6 +324,7 @@ function getVariableInfo(ast) {
  * when a function or block starts. 
  * @private */
 function startScope(processInfo,scopeType) {
+
     //initailize id gerneator
     if(processInfo.scopeIdGenerator === undefined) {
         processInfo.scopeIdGenerator = 0;
@@ -323,40 +334,52 @@ function startScope(processInfo,scopeType) {
     var scope = {};
     scope.type = scopeType;
     scope.id = String(processInfo.scopeIdGenerator++);
-    scope.parent = (scopeType == BLOCK_SCOPE) ? processInfo.currentBlockScope : processInfo.currentFunctionScope;
     scope.localVariables ={};
     
     //save this as the current scope
     processInfo.scopeTable[scope.id] = scope;
     if(scopeType == BLOCK_SCOPE) {
         //only update block scope
+        scope.blockScopeParent = processInfo.currentBlockScope;
         processInfo.currentBlockScope = scope;
     }
     else {
         //update both block and function scope
+        scope.blockScopeParent = processInfo.currentBlockScope;
+        scope.functionScopeParent = processInfo.currentFunctionScope;
         processInfo.currentFunctionScope = scope;
         processInfo.currentBlockScope = scope;
     }
+
+    console.log(`Start scope: ${scopeType} - currentBlockScope: ${processInfo.currentBlockScope.id}, currentFunctionScope: ${processInfo.currentFunctionScope.id}`);
     
+    return scope;
 }
 
 /** This method ends a local variable scope, reverting to the parent scope.
  * It should be called when a function or block exits. 
  * @private */
-function endScope(processInfo,scopeType) {
+function endScope(processInfo,scope) {
+
+    //a few tests
+    if(!scope) {
+        throw new Error("Scope undefined in end scope!");
+    }
+
+    console.log(`End scope: ${scope.type} - currentBlockScope: ${processInfo.currentBlockScope.id}, currentFunctionScope: ${processInfo.currentFunctionScope.id}`);
+
     //set the scope to the parent scope.
-    if(scopeType == BLOCK_SCOPE) {
-        let currentScope = processInfo.currentBlockScope;
-        if(currentScope) {
-            processInfo.currentBlockScope = currentScope.parent;
-        }
+    if(scope.type == BLOCK_SCOPE) {
+        if(scope != processInfo.currentBlockScope) throw new Error("Mismatch in current scope for end block scope!");
+        processInfo.currentBlockScope = scope.blockScopeParent;
+    }
+    else if(scope.type == FUNCTION_SCOPE) {
+        if(scope != processInfo.currentFunctionScope) throw new Error("Mismatch in current scope for end function scope!");
+        processInfo.currentFunctionScope = scope.functionScopeParent;
+        processInfo.currentBlockScope = scope.blockScopeParent;
     }
     else {
-        let currentScope = processInfo.currentFunctionScope;
-        if(currentScope) {
-            processInfo.currentFunctionScope = currentScope.parent;
-            processInfo.currentBlockScope = currentScope.parent;
-        }
+        throw new Error("Unrecognized scope: " + scope.type);
     }
 }
 
@@ -374,8 +397,11 @@ function processTreeNode(processInfo,node,isDeclaration,declarationKindInfo) {
         processFunction(processInfo,node); 
     }
     else if(node.type == "BlockStatement") {
-        //process the functoin
+        //process the block
         processBlock(processInfo,node);
+    }
+    else if((node.type == "ForStatement")||(node.type == "ForOfStatement")||(node.type == "ForInStatement")) {
+        processFor(processInfo,node);
     }
     else if((node.type == "NewExpression")&&(node.callee.type == "Function")) {
         //we currently do not support the function constructor
@@ -444,6 +470,17 @@ function processGenericNode(processInfo,node,declarationKindInfo) {
  * for the body of the function.
  * @private */
 function processFunction(processInfo,node) {
+
+    //we allow async functions since they still return synchronously. But if we want to disallow them, we would do this
+    // if(node.async) {
+    //     throw new Error("Defining functions a async not allowed!");
+    // }
+
+    //we do not allow generator functions since they store state. Some uses are however safe.
+    if(node.generator) {
+        throw new Error("Defining generators is not allowed!");
+    }
+
     var nodeType = node.type;
     var idNode = node.id;
     var params = node.params;
@@ -484,14 +521,20 @@ function processFunction(processInfo,node) {
     endScope(processInfo,scope);
 }
 
-/** This method processes nodes that are function. For functions a new scope is created 
- * for the body of the function.
+/** This method processes a block node. A new block type scope is created for this.
+ * Optionally, an array of additional nodes can be passed which will be processed within the block scope.
  * @private */
- function processBlock(processInfo,node) {
+ function processBlock(processInfo,node,optionalInsideNodes) {
     var body = node.body;
     
     //create a new scope for this function
     var scope = startScope(processInfo,BLOCK_SCOPE);
+
+    if(optionalInsideNodes) {
+        optionalInsideNodes.forEach(node => {
+            processTreeNode(processInfo,node,false);
+        })
+    }
     
     //process the block body
     for(var i = 0; i < body.length; i++) {
@@ -500,6 +543,26 @@ function processFunction(processInfo,node) {
     
     //end the scope for this function
     endScope(processInfo,scope);
+}
+
+/** This method processes nodes that are for for statements (including for in and for of).
+ * These require some initializations inside the body rather than outside.
+ * @private */
+ function processFor(processInfo,node) {
+    let body = node.body;
+    let otherNodeList = [];
+
+    if(node.type == "ForStatement") {
+        otherNodeList.push(node.init);
+        otherNodeList.push(node.test);
+        otherNodeList.push(node.update);
+    }
+    else {
+        otherNodeList.push(node.left);
+        otherNodeList.push(node.right);
+    }
+
+    processBlock(processInfo,body,otherNodeList);
 }
 
 /** This method processes nodes that are variables (identifiers and member expressions), adding
@@ -624,7 +687,7 @@ function markLocalVariables(processInfo) {
             var scope = nameUse.scope;
             //check if this name is a local variable in this scope or a parent scope
             var varScope = null;
-            for(var testScope = scope; testScope; testScope = testScope.parent) {
+            for(var testScope = scope; testScope; testScope = testScope.blockScopeParent) {
                 if(testScope.localVariables[name]) {
                     varScope = testScope;
                     break;

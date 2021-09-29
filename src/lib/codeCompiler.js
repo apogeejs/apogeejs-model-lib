@@ -27,7 +27,7 @@ export function validateMemberName(name) {
         nameResult.valid = false;
     }
     else if(APOGEE_FORBIDDEN_NAMES[name]) {
-        nameResult.errorMessage = "Illegal name: " + name + " - Apogee reserved keyword";
+        nameResult.errorMessage = "Illegal name: " + name + " - Apogee reserved name";
         nameResult.valid = false;
     }
     else {
@@ -159,7 +159,7 @@ function createGeneratorBody(memberFunctionName,varInfo, combinedFunctionBody) {
         scopeDeclarationText += `\nvar ${baseName};`;
         
         //add to the scope setter
-        initializerBody += `\n\t\t${baseName} = scopeManager.getValue(model,"${baseName}");`;
+        initializerBody += `\n\t\t${baseName} = __scopeManager.getValue(__model,"${baseName}");`;
     }
     
     //create the generator for the object function
@@ -173,11 +173,11 @@ return {
 ${combinedFunctionBody}
 return ${memberFunctionName}
     },
-    'scopeInitializer': function(model,scopeManager) {
+    'scopeInitializer': function(__model,__scopeManager) {
 ${initializerBody}
     },
-    'modelInitializer': function(messenger) {
-        apogeeMessenger = messenger;
+    'modelInitializer': function(__messenger) {
+        apogeeMessenger = __messenger;
     }
 };
 `
