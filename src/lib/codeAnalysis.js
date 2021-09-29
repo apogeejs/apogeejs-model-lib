@@ -251,8 +251,6 @@ export const SCOPE_INJECTS = {
  **/
 export function analyzeCode(functionText) {
 
-    console.log(functionText);
-
     var returnValue = {};
     
     try {
@@ -351,8 +349,6 @@ function startScope(processInfo,scopeType) {
         processInfo.currentBlockScope = scope;
     }
 
-    console.log(`Start scope: ${scopeType} - currentBlockScope: ${processInfo.currentBlockScope.id}, currentFunctionScope: ${processInfo.currentFunctionScope.id}`);
-    
     return scope;
 }
 
@@ -365,8 +361,6 @@ function endScope(processInfo,scope) {
     if(!scope) {
         throw new Error("Scope undefined in end scope!");
     }
-
-    console.log(`End scope: ${scope.type} - currentBlockScope: ${processInfo.currentBlockScope.id}, currentFunctionScope: ${processInfo.currentFunctionScope.id}`);
 
     //set the scope to the parent scope.
     if(scope.type == BLOCK_SCOPE) {
