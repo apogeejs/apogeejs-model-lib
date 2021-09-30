@@ -127,7 +127,7 @@ const syntax = {
 };
 
 /** These are javascript keywords */
-export const KEYWORDS = {
+const KEYWORDS = {
 	"abstract": true,
 	"arguments": true,
     "async": true,
@@ -197,7 +197,7 @@ export const KEYWORDS = {
 
 /** These are variable names we will not initialize for the member code scope.
  * NOTE - it is OK if we do not exclude a global variable. It will still work. */
-export const JAVASCRIPT_NAMES = {
+const JAVASCRIPT_NAMES = {
     "undefined": true,
     "Infinity": true,
     "NaN": true,
@@ -214,7 +214,8 @@ export const JAVASCRIPT_NAMES = {
     "console": true
 }
 
-export const APOGEE_INTERNAL_NAMES = {
+/** These are internal apogee reserved names. We ignore these names.  */
+const APOGEE_INTERNAL_NAMES = {
     //global fucntions/values
     "__memberFunctionDebugHook": true,
     "__customControlDebugHook": true,
@@ -227,9 +228,27 @@ export const APOGEE_INTERNAL_NAMES = {
     "__messenger": true
 }
 
-/** These are local values added to the scope of any model code. */
-export const SCOPE_INJECTS = {
+/** These are internal apogee names we potentially inject into the sope of a given member. */
+const APOGEE_SCOPE_INJECT_NAMES = {
     "apogeeMessenger": true
+}
+
+/** This function can be used to see if a variable name is reserved becaues it is reserved. */
+export function isNameReserved(variableName) {
+    let reservedResult = {reserved: false};
+    if(KEYWORDS[variableName]) {
+        reservedResult.message = "Javascript reserved keyword";
+        reservedResult.reserved = true;
+    }  
+    else if(JAVASCRIPT_NAMES[variableName]) {
+        reservedResult.message = "Javascript variable or value name";
+        reservedResult.reserved = true;
+    }
+    else if((APOGEE_INTERNAL_NAMES[variableName])||(APOGEE_SCOPE_INJECT_NAMES[variableName])) {
+        reservedResult.message = "Apogee reserved name";
+        reservedResult.reserved = true;
+    }
+    return reservedResult;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -583,7 +602,7 @@ function processVariable(processInfo,node,isDeclaration,declarationKindInfo) {
         nameEntry.name = baseName;
         nameEntry.uses = [];
 
-        if(SCOPE_INJECTS[baseName]) {
+        if(APOGEE_SCOPE_INJECT_NAMES[baseName]) {
             nameEntry.scopeInjects = true;
         }
         

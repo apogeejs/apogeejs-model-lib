@@ -1,4 +1,4 @@
-import {KEYWORDS, JAVASCRIPT_NAMES, APOGEE_INTERNAL_NAMES, analyzeCode} from "/apogeejs-model-lib/src/lib/codeAnalysis.js"; 
+import {isNameReserved, analyzeCode} from "/apogeejs-model-lib/src/lib/codeAnalysis.js"; 
 
 /** This test for a valid member name, including tests for excluded names.  
  * @private */
@@ -10,18 +10,11 @@ export function validateMemberName(name) {
     var nameResult = {};
 
     //check if it is a keyword
-    if(KEYWORDS[name]) {
-        nameResult.errorMessage = "Illegal name: " + name + " - Javascript reserved keyword";
+    let reservedResult = isNameReserved(name);
+    if(reservedResult.reserved) {
+        nameResult.errorMessage = "Illegal name: " + name + " - " + reservedResult.message;
         nameResult.valid = false;
     }  
-    else if(JAVASCRIPT_NAMES[name]) {
-        nameResult.errorMessage = "Illegal name: " + name + " - Javascript variable or value name";
-        nameResult.valid = false;
-    }
-    else if(APOGEE_INTERNAL_NAMES[name]) {
-        nameResult.errorMessage = "Illegal name: " + name + " - Apogee reserved name";
-        nameResult.valid = false;
-    }
     else {
         //check the pattern
         var nameResult = NAME_PATTERN.exec(name);
