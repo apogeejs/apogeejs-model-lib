@@ -197,7 +197,7 @@ export const KEYWORDS = {
 
 /** These are variable names we will not initialize for the member code scope.
  * NOTE - it is OK if we do not exclude a global variable. It will still work. */
-export const EXCLUSION_NAMES = {
+export const JAVASCRIPT_NAMES = {
     "undefined": true,
     "Infinity": true,
     "NaN": true,
@@ -211,8 +211,10 @@ export const EXCLUSION_NAMES = {
     "Error": true,
     "RegExp": true,
     
-    "console": true,
+    "console": true
+}
 
+export const APOGEE_INTERNAL_NAMES = {
     //global fucntions/values
     "__memberFunctionDebugHook": true,
     "__customControlDebugHook": true,
@@ -223,7 +225,6 @@ export const EXCLUSION_NAMES = {
     "__model": true,
     "__scopeManager": true,
     "__messenger": true
-
 }
 
 /** These are local values added to the scope of any model code. */
@@ -571,7 +572,7 @@ function processVariable(processInfo,node,isDeclaration,declarationKindInfo) {
     var baseName = namePath[0];
     
     //check if it is an excluded name - such as a variable name used by javascript
-    if(EXCLUSION_NAMES[baseName]) {
+    if((JAVASCRIPT_NAMES[baseName])||(APOGEE_INTERNAL_NAMES[baseName])) {
         return;
     }
     

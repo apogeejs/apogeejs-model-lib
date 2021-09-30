@@ -1,12 +1,4 @@
-import {KEYWORDS, EXCLUSION_NAMES, analyzeCode} from "/apogeejs-model-lib/src/lib/codeAnalysis.js"; 
-
-/** @private */
-const APOGEE_FORBIDDEN_NAMES = {
-    "apogeeMessenger": true,
-    "__memberFunctionDebugHook": true,
-    "__customControlDebugHook": true,
-    "__functionMemberWrapper": true
-}
+import {KEYWORDS, JAVASCRIPT_NAMES, APOGEE_INTERNAL_NAMES, analyzeCode} from "/apogeejs-model-lib/src/lib/codeAnalysis.js"; 
 
 /** This test for a valid member name, including tests for excluded names.  
  * @private */
@@ -22,11 +14,11 @@ export function validateMemberName(name) {
         nameResult.errorMessage = "Illegal name: " + name + " - Javascript reserved keyword";
         nameResult.valid = false;
     }  
-    else if(EXCLUSION_NAMES[name]) {
+    else if(JAVASCRIPT_NAMES[name]) {
         nameResult.errorMessage = "Illegal name: " + name + " - Javascript variable or value name";
         nameResult.valid = false;
     }
-    else if(APOGEE_FORBIDDEN_NAMES[name]) {
+    else if(APOGEE_INTERNAL_NAMES[name]) {
         nameResult.errorMessage = "Illegal name: " + name + " - Apogee reserved name";
         nameResult.valid = false;
     }
