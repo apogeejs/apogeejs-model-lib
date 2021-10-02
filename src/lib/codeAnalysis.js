@@ -195,27 +195,49 @@ const KEYWORDS = {
 	"yield": true,
 };
 
-/** These are variable names we will not initialize for the member code scope.
- * NOTE - it is OK if we do not exclude a global variable. It will still work. */
-const JAVASCRIPT_NAMES = {
+/** These are token names we do not include in our member scope initialization. 
+ * These variable names are also reserved. */
+const JAVASCRIPT_IGNORE_NAMES = {
     "undefined": true,
     "Infinity": true,
-    "NaN": true,
-    
-    "String": true,
-    "Number": true,
-    "Math": true,
-    "Date": true,
-    "Array": true,
-    "Boolean": true,
-    "Error": true,
-    "RegExp": true,
-    
-    "console": true
+    "NaN": true
 }
 
-/** These are internal apogee reserved names. We ignore these names.  */
-const APOGEE_INTERNAL_NAMES = {
+/** These are variables we include in our member scope initialization and
+ * we whitelist from globals. These variable names are also reserved. */
+const JAVASCRIPT_WHITELIST_NAMES = {
+    //javscript objects
+    "Array": true,
+    "Boolean": true,
+    "Date": true,
+    "Error": true,
+    "JSON": true,
+    "Math": true,
+    "Number": true,
+    "RegExp": true,
+    "String": true,
+
+    //javascript globals
+    "decodeURI": true,
+    "decodeURIComponent": true,
+    "encodeURI": true,
+    "encodeURIComponent": true,
+    "escape": true, //javascript deprecated
+    "eval": true,
+    "isFinite": true,
+    "isNaN": true,
+    "parseFloat": true,
+    "parseInt": true,
+    "unescape": true, //javascript deprecated
+    
+    ///////////////////////////////////////////////////////////////////////////
+    //web apis - NOTE - whitelist these based on platform! This is temporary!
+    "console": true,
+    ////////////////////////////////////////////////////////////////////////
+}
+
+/** These are internal apogee reserved names. */
+const APOGEE_RESERVED_NAMES = {
     //global fucntions/values
     "__memberFunctionDebugHook": true,
     "__customControlDebugHook": true,
@@ -225,7 +247,28 @@ const APOGEE_INTERNAL_NAMES = {
     //used in code compiler
     "__model": true,
     "__scopeManager": true,
-    "__messenger": true
+    "__messenger": true,
+
+    //other
+    "apogeeMessenger": true
+}
+
+/** These are global values defnined by apogee, added to the globals whitelist */
+const APOGEE_WHITELIST_NAMES = {
+    //global fucntions/values
+    "__memberFunctionDebugHook": true,
+    "__customControlDebugHook": true,
+    "__memberFunctionDebugHook": true,
+
+    //libraries
+    "apogeeutil": true,
+    "_": true,
+
+    //asynch alert functions
+    "apogeeLog": true,
+    "apogeeUserAlert": true,
+    "apogeeUserConfirm": true,
+    "apogeeUserConfirmSynchronous": true
 }
 
 /** These are internal apogee names we potentially inject into the sope of a given member. */
@@ -240,15 +283,22 @@ export function isNameReserved(variableName) {
         reservedResult.message = "Javascript reserved keyword";
         reservedResult.reserved = true;
     }  
-    else if(JAVASCRIPT_NAMES[variableName]) {
+    else if((JAVASCRIPT_WHITELIST_NAMES[variableName])||(JAVASCRIPT_IGNORE_NAMES[variableName])) {
         reservedResult.message = "Javascript variable or value name";
         reservedResult.reserved = true;
     }
-    else if((APOGEE_INTERNAL_NAMES[variableName])||(APOGEE_SCOPE_INJECT_NAMES[variableName])) {
+    else if(APOGEE_RESERVED_NAMES[variableName]) {
         reservedResult.message = "Apogee reserved name";
         reservedResult.reserved = true;
     }
     return reservedResult;
+}
+
+/** This function checks if the given variable name is a global name that is whitelisted. This only
+ * contains whitelist elements from the base javascript and apogee language and does not include a facility
+ * adding user defined values, such as module imports, to the whitelist. */
+export function isInLanguageWhiteList(variableName) {
+    return ((JAVASCRIPT_WHITELIST_NAMES[variableName])||(APOGEE_WHITELIST_NAMES[variableName]));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -591,10 +641,10 @@ function processVariable(processInfo,node,isDeclaration,declarationKindInfo) {
     var baseName = namePath[0];
     
     //check if it is an excluded name - such as a variable name used by javascript
-    if((JAVASCRIPT_NAMES[baseName])||(APOGEE_INTERNAL_NAMES[baseName])) {
+    if(JAVASCRIPT_IGNORE_NAMES[baseName]) {
         return;
-    }
-    
+    }    
+
     //add to the name member
     var nameEntry = processInfo.nameTable[baseName];
     if(!nameEntry) {

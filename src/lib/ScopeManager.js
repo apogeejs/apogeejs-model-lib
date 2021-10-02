@@ -1,3 +1,5 @@
+import {isInLanguageWhiteList} from "/apogeejs-model-lib/src/lib/codeAnalysis.js"; 
+
 /** This class manages variable scope for the user code. It is used to look up 
  * variables both to find dependencies in member code or to find the value for
  * member code execution.
@@ -131,20 +133,25 @@ ScopeManager.prototype.lookupMember = function(model,pathArray,index) {
 }
 
 ScopeManager.prototype.getValueFromGlobals = function(varName) {
+
     ///////////////////////////////////
     //CLUDGE - Here we can added additional values that are not in globals
     //This is here because, for now, on the server require did not appear in globals, so we put it here.
     //I think this is because it is only exposed in certain places, possibly related to their es module
     //implementation.  
-    if(__globals__.__apogee_globals__) {
-        let value = __globals__.__apogee_globals__[varName];
-        if(value !== undefined) return value; 
-    }
+    // if(__globals__.__apogee_globals__) {
+    //     let value = __globals__.__apogee_globals__[varName];
+    //     if(value !== undefined) return value; 
+    // }
     /////////////////////////////////////
 
-    //for now don't do any filtering
-    //in the future we may want to do something so people don't deine their own globals - TBD
-    return __globals__[varName];
+    //try to read from platform
+    let platformValue = apogeeplatform.getGlobal(varName);
+    if(platformValue !== undefined) return platformValue;
+
+    //try to read from javascript globals - whitelisted only
+    if(isInLanguageWhiteList(varName)) return __globals__[varName];
+    else return undefined;
 }
 
 
