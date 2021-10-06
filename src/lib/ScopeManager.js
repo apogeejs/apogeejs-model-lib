@@ -134,19 +134,8 @@ ScopeManager.prototype.lookupMember = function(model,pathArray,index) {
 
 ScopeManager.prototype.getValueFromGlobals = function(varName) {
 
-    ///////////////////////////////////
-    //CLUDGE - Here we can added additional values that are not in globals
-    //This is here because, for now, on the server require did not appear in globals, so we put it here.
-    //I think this is because it is only exposed in certain places, possibly related to their es module
-    //implementation.  
-    // if(__globals__.__apogee_globals__) {
-    //     let value = __globals__.__apogee_globals__[varName];
-    //     if(value !== undefined) return value; 
-    // }
-    /////////////////////////////////////
-
     //try to read from platform
-    let platformValue = apogeeplatform.getModelGlobal(varName);
+    let platformValue = getModelGlobal(varName);
     if(platformValue !== undefined) return platformValue;
 
     //try to read from javascript globals - whitelisted only
