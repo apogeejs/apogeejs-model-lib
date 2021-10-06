@@ -2,19 +2,22 @@
 global.__globals__ = global;
 global.__APOGEE_ENVIRONMENT__ = "NODE";
 
+//define the module load functions - loadModule is the same as require
+__globals__.loadModule = require;
+
 //these function should be replaced with an implementation at the appication level
 
 /** This prints a message in the alert log */
-__globals__.apogeeLog = (msg) => console.log(message);
+//__globals__.apogeeLog = (msg) => console.log(message);
 
 /** This function asynchronously gives an alert the user */
-__globals__.apogeeUserAlert = (msg) => undefined;
+//__globals__.apogeeUserAlert = (msg) => undefined;
 
 /** This function asynchornously lets the confirm or cancel an action. */
-__globals__.apogeeUserConfirm = (msg,okText,cancelText,okAction,cancelAction,defaultToOk) => defaultToOk ? okAction : cancelAction;
+//__globals__.apogeeUserConfirm = (msg,okText,cancelText,okAction,cancelAction,defaultToOk) => defaultToOk ? okAction : cancelAction;
 
 /** This synchronous funtion returns true or false for ok or cancel. */
-__globals__.apogeeUserConfirmSynchronous = (msg,okText,cancelText,defaultToOk) => defaultToOk;
+//__globals__.apogeeUserConfirmSynchronous = (msg,okText,cancelText,defaultToOk) => defaultToOk;
 
 //a global def we wil use in UI
 // declare global: os, navigator

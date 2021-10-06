@@ -146,7 +146,7 @@ ScopeManager.prototype.getValueFromGlobals = function(varName) {
     /////////////////////////////////////
 
     //try to read from platform
-    let platformValue = apogeeplatform.getGlobal(varName);
+    let platformValue = apogeeplatform.getModelGlobal(varName);
     if(platformValue !== undefined) return platformValue;
 
     //try to read from javascript globals - whitelisted only
