@@ -245,9 +245,7 @@ const APOGEE_RESERVED_NAMES = {
     "__globals__": true,
 
     //used in code compiler
-    "__model": true,
-    "__scopeManager": true,
-    "__messenger": true,
+    "__inputMap": true,
 
     //other
     "apogeeMessenger": true

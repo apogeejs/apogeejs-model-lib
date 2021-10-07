@@ -41,7 +41,7 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
     //get the accessed variables
     //
     //parse the code and get variable dependencies
-    var effectiveCombinedFunctionBody = getEffectiveFunctionBodyHeader(memberFunctionName) + combinedFunctionBody;
+    var effectiveCombinedFunctionBody = _getEffectiveFunctionBodyHeader(memberFunctionName) + combinedFunctionBody;
     var analyzeOutput = analyzeCode(effectiveCombinedFunctionBody);
     
     var compiledInfo = {};
@@ -57,7 +57,7 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
     }
 
     //create and execute the generator function
-    var generatorBody = createGeneratorBody(memberFunctionName,compiledInfo.varInfo, combinedFunctionBody);
+    var {generatorBody,inputMapKeys} = createGeneratorBody(memberFunctionName,compiledInfo.varInfo, combinedFunctionBody);
     try {
         //execute the generator function to get the member function generator
         //and the memberScopeInitializer
@@ -66,7 +66,10 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
         //get the output functions
         var generatedFunctions = generatorFunction();
         compiledInfo.memberFunctionGenerator = generatedFunctions.memberGenerator;
-        compiledInfo.memberScopeInitializer = generatedFunctions.scopeInitializer; 
+        compiledInfo.memberScopeInitializer = (model,scopeManager) => {
+            let inputMap = _createInputMap(model,scopeManager,inputMapKeys);
+            generatedFunctions.scopeInitializer(inputMap);
+        } 
         compiledInfo.memberModelInitializer =  generatedFunctions.modelInitializer; 
         compiledInfo.valid = true; 
         compiledInfo.generatorFunction = generatorFunction;                
@@ -132,6 +135,7 @@ function createGeneratorBody(memberFunctionName,varInfo, combinedFunctionBody) {
     
     var scopeDeclarationText = "";
     var initializerBody = "";
+    var inputMapKeys = [];
     
     //set the scope - here we only defined the variables that are actually used.
 	for(var baseName in varInfo) {        
@@ -141,10 +145,11 @@ function createGeneratorBody(memberFunctionName,varInfo, combinedFunctionBody) {
         if((baseNameInfo.isLocal)||(baseNameInfo.scopeInjects)) continue;
         
         //add a declaration
+        inputMapKeys.push(baseName);
         scopeDeclarationText += `\nvar ${baseName};`;
         
         //add to the scope setter
-        initializerBody += `\n\t\t${baseName} = __scopeManager.getValue(__model,"${baseName}");`;
+        initializerBody += `\n\t\t${baseName} = __inputMap.${baseName}`;
     }
     
     //create the generator for the object function
@@ -158,23 +163,38 @@ return {
 ${combinedFunctionBody}
 return ${memberFunctionName}
     },
-    'scopeInitializer': function(__model,__scopeManager) {
-${initializerBody}
+    'scopeInitializer': function(__inputMap) {${initializerBody}
     },
     'modelInitializer': function(__messenger) {
         apogeeMessenger = __messenger;
     }
 };
 `
-    return generatorBody;    
+    return {generatorBody,inputMapKeys};    
 }
 
    
 /** This line is added for analyzing the body to add any desired header information.
  * @private */
-function getEffectiveFunctionBodyHeader(memberFunctionName) {
+function _getEffectiveFunctionBodyHeader(memberFunctionName) {
     return `'use strict'
 `
+}
+
+function _createInputMap(model,scopeManager,inputMapKeys) {
+    let inputMap = {};
+    let undefinedValues = [];
+    inputMapKeys.forEach(variableName => {
+        let value = scopeManager.getValue(model,variableName);
+        inputMap[variableName] = value;
+        if(value === undefined) {
+            undefinedValues.push(variableName);
+        }
+    });
+    if(undefinedValues.length > 0) {
+        throw new Error("The following variables have not been defined or are not currently available in member code: " + undefinedValues.toString());
+    }
+    return inputMap;
 }
    
 
