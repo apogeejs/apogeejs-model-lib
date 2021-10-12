@@ -236,8 +236,11 @@ __globals__.modelLoadModule = function(moduleName,flags) {
 // Adding additional variables to model
 //==============================
 
-__globals__.addDataToModelGlobals(loadModule,__globals__.modelLoadModule,true);
+__globals__.addDataToModelGlobals("loadModule",__globals__.modelLoadModule,true);
 
 //add some locally defined globals to the model whitelist
 __globals__.addNameToModelGlobals("__APOGEE_ENVIRONMENT__",true);
 __globals__.addNameToModelGlobals("__OS_IS_MAC__",true);
+__globals__.addNameToModelGlobals("apogeeModuleExport",true);
+
+
