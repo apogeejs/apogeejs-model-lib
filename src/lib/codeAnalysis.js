@@ -207,6 +207,7 @@ const JAVASCRIPT_IGNORE_NAMES = {
  * we whitelist from globals. These variable names are also reserved. */
 const JAVASCRIPT_WHITELIST_NAMES = {
     //javscript objects
+    "Object": true,
     "Array": true,
     "Boolean": true,
     "Date": true,
@@ -256,7 +257,6 @@ const APOGEE_WHITELIST_NAMES = {
     //global fucntions/values
     "__memberFunctionDebugHook": true,
     "__customControlDebugHook": true,
-    "__memberFunctionDebugHook": true,
 
     //libraries
     "apogeeutil": true,
@@ -821,3 +821,4 @@ function createErrorInfoFromAstInfo(functionText,astErrors) {
 
 const FUNCTION_SCOPE = "function";
 const BLOCK_SCOPE = "block";
+
