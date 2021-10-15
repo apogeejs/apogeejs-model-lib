@@ -1,6 +1,6 @@
 //some global definitions for the node environment
 global.__globals__ = global;
-__global__.__APOGEE_ENVIRONMENT__ = "NODE";
+__globals__.__APOGEE_ENVIRONMENT__ = "NODE";
 
 //a global def we wil use in UI
 // declare global: os, navigator
@@ -59,9 +59,9 @@ __globals__.getModelGlobal = function(variableName) {
     if(platformGlobals[variableName] !== undefined) {
         return platformGlobals[variableName].data;
     }
-    if(globalWhiteList[variableName]) {
+//    if(globalWhiteList[variableName]) {
         return __globals__[variableName];
-    }
+//    }
 }
 
 //Model globals white list
@@ -127,12 +127,12 @@ __globals__.removeNameFromModelModules = function(moduleName) {
 
 //This is the loadModule function to be used in the model, passing only white listed modules
 __globals__.modelLoadModule = function(moduleName,flags) {
-    if(whiteListedModuleNames[moduleName] !== undefined) {
+//    if(whiteListedModuleNames[moduleName] !== undefined) {
         return __globals__.loadModule(moduleName,flags);
-    }
-    else {
-        return null;
-    }
+//    }
+//    else {
+//        return null;
+//    }
 }
 
 //==============================
