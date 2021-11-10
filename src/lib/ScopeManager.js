@@ -139,8 +139,10 @@ ScopeManager.prototype.getValueFromGlobals = function(varName) {
     if(platformValue !== undefined) return platformValue;
 
     //try to read from javascript globals - whitelisted only
-    if(isInLanguageWhiteList(varName)) return __globals__[varName];
-    else return undefined;
+    ///// IGNORE WHITELIST - RETURN ALL /////
+    // if(isInLanguageWhiteList(varName)) return __globals__[varName];
+    // else return undefined;
+    return __globals__[varName]
 }
 
 

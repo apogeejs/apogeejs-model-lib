@@ -59,6 +59,7 @@ __globals__.getModelGlobal = function(variableName) {
     if(platformGlobals[variableName] !== undefined) {
         return platformGlobals[variableName].data;
     }
+    ///// IGNORE WHITELIST - RETURN ALL /////
 //    if(globalWhiteList[variableName]) {
         return __globals__[variableName];
 //    }
