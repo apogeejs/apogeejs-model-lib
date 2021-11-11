@@ -82,7 +82,8 @@ export default class ModelRunContextLink {
         else {
             //this is an action passed in from outside
             //run this as an external command, asynchronously
-            setTimeout(() => this.modelRunContext.futureExecuteAction(currentModel.getId(),actionData),0); 
+            //setTimeout(() => this.modelRunContext.futureExecuteAction(currentModel.getId(),actionData),0); 
+            this.modelRunContext.futureExecuteAction(currentModel.getId(),actionData)
         }
     }
 
