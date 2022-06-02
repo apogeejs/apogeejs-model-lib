@@ -115,7 +115,7 @@ export default class Model extends FieldObject {
 
         return newModel;
     }
-
+    
     /** This method locks all object instances and the model instance. */
     lockAll() {
         //clear up working fields
@@ -136,16 +136,16 @@ export default class Model extends FieldObject {
 
     /** This completes any lazy initialization. This must be done before the model and the members are locked. 
      * Any member not yet initialized would be a lazy initialize function that was neever called. */
-    completeLazyInitialization() {
-        //object map includes all members and the model
-        let activeObjectMap = this._getActiveObjectMap();
-        for(let id in activeObjectMap) {
-            let object = activeObjectMap[id];
-            if(object.lazyInitializeIfNeeded) {
-                object.lazyInitializeIfNeeded();
-            }
-        }
-    }
+    // completeLazyInitialization() {
+    //     //object map includes all members and the model
+    //     let activeObjectMap = this._getActiveObjectMap();
+    //     for(let id in activeObjectMap) {
+    //         let object = activeObjectMap[id];
+    //         if(object.lazyInitializeIfNeeded) {
+    //             object.lazyInitializeIfNeeded();
+    //         }
+    //     }
+    // }
 
     /** This shoudl be called after all dependencies have been updated to store the
      * impacts map (We kept a mutable working copy during construction for efficiency)  */

@@ -84,27 +84,6 @@ export default class FunctionMember extends CodeableMember {
         return wrappedMemberFunction;
     }
 
-    /** The function is lazy initialized so it can call itself without a 
-     * ciruclar reference. The initialization happens on the first actual call. This is OK if we are doing the
-     * model calculation. but if it is first called _AFTER_ the model has completed being calculated, such as
-     * externally, then we will get a locked error when the lazy initialization happens. Instead, we will
-     * complete the lazy initialization before the lock is done. At this point we don't need to worry about
-     * circular refernce anyway, since the model has already completed its calculation. */
-    lazyInitializeIfNeeded() {
-        //check if the function is initialized
-        let memberFunction = this.getData();
-        if((memberFunction)&&(memberFunction.initIfNeeded)) {
-            try {
-                memberFunction.initIfNeeded();
-            }
-            catch(error) {
-                //this error is already handled in the function member initializer
-                //it is rethrown so a calling member can also get the error, since it was not present at regular intialization
-                //if we initialize here in lock, that means there is nobody who called this.
-            }
-        }
-    }
-
     //------------------------------
     // Member Methods
     //------------------------------
@@ -122,6 +101,41 @@ export default class FunctionMember extends CodeableMember {
         }
         else {
             return null;
+        }
+    }
+
+    //------------------------------
+    // FieldObject Methods
+    //------------------------------
+
+    /** This takes any mutator actions immedaitely before the object is locked */
+    beforeLock() {
+        this._lazyInitializeIfNeeded();
+    }
+
+
+    //---------------------------
+    // Internal methods
+    //---------------------------
+
+    /** The function is lazy initialized so it can call itself without a 
+     * ciruclar reference. The initialization happens on the first actual call. This is OK if we are doing the
+     * model calculation. but if it is first called _AFTER_ the model has completed being calculated, such as
+     * externally, then we will get a locked error when the lazy initialization happens. Instead, we will
+     * complete the lazy initialization before the lock is done. At this point we don't need to worry about
+     * circular refernce anyway, since the model has already completed its calculation. */
+     _lazyInitializeIfNeeded() {
+        //check if the function is initialized
+        let memberFunction = this.getData()
+        if((memberFunction)&&(memberFunction.initIfNeeded)) {
+            try {
+                memberFunction.initIfNeeded()
+            }
+            catch(error) {
+                //this error is already handled in the function member initializer
+                //it is rethrown so a calling member can also get the error, since it was not present at regular intialization
+                //if we initialize here in lock, that means there is nobody who called this.
+            }
         }
     }
 
