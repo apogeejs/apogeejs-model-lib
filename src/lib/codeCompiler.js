@@ -182,19 +182,12 @@ function _getEffectiveFunctionBodyHeader(memberFunctionName) {
 }
 
 function _createInputMap(model,scopeManager,inputMapKeys) {
-    let inputMap = {};
-    let undefinedValues = [];
+    let inputMap = {}
     inputMapKeys.forEach(variableName => {
-        let value = scopeManager.getValue(model,variableName);
-        inputMap[variableName] = value;
-        if(value === undefined) {
-            undefinedValues.push(variableName);
-        }
-    });
-    if(undefinedValues.length > 0) {
-        throw new Error("The following variables have not been defined or are not currently available in member code: " + undefinedValues.toString());
-    }
-    return inputMap;
+        let value = scopeManager.getValue(model,variableName)
+        inputMap[variableName] = value
+    })
+    return inputMap
 }
    
 
