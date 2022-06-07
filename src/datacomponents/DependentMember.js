@@ -62,8 +62,43 @@ export default class DependentMember extends Member {
         this.clearState();
     }
 
-    ///** This updates the member based on a change in a dependency.  */
-    //calculate(model);
+    ///** This updates the member based on a change in a dependency.  
+    //  * The implementation of this function should add the current member to the memberCalculate stack at the start
+    //  * of the function and remove it at the end. It will be used in calls made by this function, ultimately to 
+    //  * initializeImpactors, where it is used to detect circular references. */
+    calculate(model,memberCalculateStack) {
+        if(this._checkCircularDependency(model,memberCalculateStack)) {
+            this.clearCalcPending()
+            return
+        }
+            
+        memberCalculateStack.push(this)
+        this.calculateImpl(model,memberCalculateStack)
+        memberCalculateStack.pop()
+
+        this.clearCalcPending();
+
+    }
+
+    // Implement the member calculation here
+    //calculateImpl(model,memberCalculateStack)
+
+
+    /** This checks for a circular dependence error, setting it if it is found. It returns true or false based on the
+     * presence of the error. */
+    _checkCircularDependency(model,memberCalculateStack) {
+        let prevIndex = memberCalculateStack.indexOf(this)
+        if(prevIndex >= 0) {
+            let circularReferenceObjects = memberCalculateStack.slice(prevIndex)
+            circularReferenceObjects.push(this)
+            let error = Member.createCircularReferenceError(model,circularReferenceObjects)
+            this.setError(model,error)
+            return true;
+        }
+        else {
+            return false
+        }
+    }
 
     /** This method calculates the contribution to the state of the member based on it dependencies. */
     calculateDependentState(model,doSetState) {
@@ -112,13 +147,13 @@ export default class DependentMember extends Member {
 
     /** This method makes sure any impactors are set. It sets a dependency 
      * error if one or more of the dependencies has a error. */
-    initializeImpactors(model) {
+    initializeImpactors(model,memberCalculateStack) {
         //make sure dependencies are up to date
         let dependsOnMap = this.getField("dependsOnMap");
         for(var idString in dependsOnMap) {
             let impactor = model.lookupObjectById(idString);
             if((impactor.isDependent)&&(impactor.getCalcPending())) {
-                impactor.calculate(model);
+                impactor.calculate(model,memberCalculateStack);
             }
         }
     }

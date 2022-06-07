@@ -13,18 +13,18 @@ export default class FunctionMember extends CodeableMember {
     // Codeable Methods
     //------------------------------
 
-    processMemberFunction(model,memberGenerator) {
-        var memberFunction = this.getLazyInitializedMemberFunction(model,memberGenerator);
+    processMemberFunction(model,memberGenerator,memberCalculateStack) {
+        var memberFunction = this.getLazyInitializedMemberFunction(model,memberGenerator,memberCalculateStack);
         this.setData(model,memberFunction);
     }
 
-    getLazyInitializedMemberFunction(model,memberGenerator) {
+    getLazyInitializedMemberFunction(model,memberGenerator,memberCalculateStack) {
 
         //create init member function for lazy initialization
         //we need to do this for recursive functions, or else we will get a circular reference
         //here we have logic to notify of an error or other problem in the function
         var initMember = () => {
-            var impactorSuccess = this.initializeMemberFunction(model);
+            var impactorSuccess = this.initializeMemberFunction(model,memberCalculateStack);
             if(impactorSuccess) {
                 //this returns the member function
                 return memberGenerator();

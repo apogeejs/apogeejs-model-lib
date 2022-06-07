@@ -89,9 +89,9 @@ export default class Folder extends DependentMember {
      * once we initialize the impactors. We update the value incrementally so that we do not need to calculate all children
      * before any data is read from the folder. If we waited, we would get a circular dependecy if we trie to specify the 
      * name of a member including the path to it. We need to allow this to avoid name colisions at times.  */
-    calculate(model) {
+    calculateImpl(model,memberCalculateStack) {
         //make sure the data is set in each impactor
-        this.initializeImpactors(model);
+        this.initializeImpactors(model,memberCalculateStack)
         
         //see note in method description - no calculation is done here. It is done incrementally as children are calculated.
         //BUT if there was no update of children since prepare for calculate,
@@ -105,9 +105,6 @@ export default class Folder extends DependentMember {
             //here we will always set the data whether or not there are any issues in dependents
             this.setStateAndData(model,state,data,error,true);
         }
-
-        //clear calc pending flag
-        this.clearCalcPending();
     }
 
     /** This method updates the dependencies of any children

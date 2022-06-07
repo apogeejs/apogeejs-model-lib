@@ -427,6 +427,15 @@ export default class Member extends FieldObject {
         apogeeutil.appendErrorInfo(dependsOnError,dependsOnErrorInfo);
         return dependsOnError;
     }
+
+    static createCircularReferenceError(model,circularReferenceObjects) {
+        let error = new Error("Circular reference error")
+        error.isCircularReferenceError = true
+        let circularReferenceString = circularReferenceObjects.map(member => member.getFullName(model)).join(" -> ")
+        let errorInfo = {description: "Circular reference: " + circularReferenceString}
+        apogeeutil.appendErrorInfo(error,errorInfo)
+        return error
+    }
 }
 
 /** This function executes the action data agains the current model in the given run context. If the

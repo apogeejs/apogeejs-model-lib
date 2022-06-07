@@ -34,11 +34,7 @@ export default class CodeableMember extends DependentMember {
             //"compiledInfo"
             //and more...
         }
-        
-        //==============
-        //Working variables
-        //==============
-        this.dependencyInitInProgress = false;
+
     }
 
     /** This property tells if this object is a codeable.
@@ -150,7 +146,8 @@ export default class CodeableMember extends DependentMember {
     }
 
     /** This method sets the data object for the member.  */
-    calculate(model) {
+    calculateImpl(model,memberCalculateStack) {
+
         //no calculation if there is no code. We shouldn't get here, but just in case.
         if(!this.hasCode()) {
             return;
@@ -169,9 +166,9 @@ export default class CodeableMember extends DependentMember {
             this.clearCalcPending();
             return;
         }
-      
+    
         try {
-            this.processMemberFunction(model,compiledInfo.memberFunctionGenerator);
+            this.processMemberFunction(model,compiledInfo.memberFunctionGenerator,memberCalculateStack);
         }
         catch(error) {
             
@@ -563,24 +560,19 @@ export default class CodeableMember extends DependentMember {
     //processMemberFunction 
     
     /** This makes sure user code of object function is ready to execute.  */
-    initializeMemberFunction(model) {
-        //make sure this in only called once
-        if(this.dependencyInitInProgress) {
-            this.setError(model,"Circular reference error");
-            //clear calc in progress flag
-            this.dependencyInitInProgress = false;
-            return false;
-        }
+    initializeMemberFunction(model,memberCalculateStack) {
 
-        this.dependencyInitInProgress = true;
         try {
             //make sure the data is set in each impactor
-            this.initializeImpactors(model);
-            this.calculateDependentState(model,true);
-            let state = this.getState();
+            this.initializeImpactors(model,memberCalculateStack);
+
+            let state = this.getState()
+            //if we have no error, check if we inherit a state from the members we depend on
+            if(state != apogeeutil.STATE_ERROR) {
+                this.calculateDependentState(model,true);
+            }
+            state = this.getState();
             if((state == apogeeutil.STATE_ERROR)||(state == apogeeutil.STATE_PENDING)||(state == apogeeutil.STATE_INVALID)) {
-                //stop initialization if there is an issue in a dependent
-                this.dependencyInitInProgress = false;
                 return false;
             }
             
@@ -594,7 +586,6 @@ export default class CodeableMember extends DependentMember {
             }
 
             //successful init
-            this.dependencyInitInProgress = false;
             return true;
         }
         catch(error) {
@@ -609,7 +600,6 @@ export default class CodeableMember extends DependentMember {
             this.setError(model,error);
 
             //failed init
-            this.dependencyInitInProgress = false;
             return false;
         }
     }
