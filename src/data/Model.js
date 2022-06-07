@@ -134,19 +134,6 @@ export default class Model extends FieldObject {
         }
     }
 
-    /** This completes any lazy initialization. This must be done before the model and the members are locked. 
-     * Any member not yet initialized would be a lazy initialize function that was neever called. */
-    // completeLazyInitialization() {
-    //     //object map includes all members and the model
-    //     let activeObjectMap = this._getActiveObjectMap();
-    //     for(let id in activeObjectMap) {
-    //         let object = activeObjectMap[id];
-    //         if(object.lazyInitializeIfNeeded) {
-    //             object.lazyInitializeIfNeeded();
-    //         }
-    //     }
-    // }
-
     /** This shoudl be called after all dependencies have been updated to store the
      * impacts map (We kept a mutable working copy during construction for efficiency)  */
     finalizeImpactsMap() {
@@ -167,15 +154,6 @@ export default class Model extends FieldObject {
      * model instance is unlocked. */
     getChangeMap() {
         return this.workingChangeMap;
-    }
-
-    /** This function should be used to execute any action that is run asynchronously with the current
-     * action. The action is run on a model and it is uncertain whether the existing model will still be 
-     * current when this new action is run. An example of when this is used is to populate a data member in
-     * response to a json request completing.  */
-    doFutureAction(actionData) {
-        //run this action asynchronously
-        this.runContextLink.futureExecuteAction(this.getId(),actionData);
     }
 
     /** This method returns the root object - implemented from RootHolder.  */

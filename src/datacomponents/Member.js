@@ -299,7 +299,7 @@ export default class Member extends FieldObject {
             actionData.memberId = this.getId();
             actionData.sourcePromise = promise;
             actionData.data = memberValue;
-            model.doFutureAction(actionData);
+            doFutureAction(model,actionData);
         }
         var asynchErrorCallback = error => {
 
@@ -313,7 +313,7 @@ export default class Member extends FieldObject {
             actionData.memberId = this.getId();
             actionData.sourcePromise = promise;
             actionData.data = error;
-            model.doFutureAction(actionData);
+            doFutureAction(model,actionData);
         }
 
         //call appropriate action when the promise completes
@@ -426,5 +426,14 @@ export default class Member extends FieldObject {
         dependsOnError.isDependsOnError = true;
         apogeeutil.appendErrorInfo(dependsOnError,dependsOnErrorInfo);
         return dependsOnError;
+    }
+}
+
+/** This function executes the action data agains the current model in the given run context. If the
+ * model is not an active part of the model run context the action will not be run. */
+function doFutureAction(model,actionData) {
+    let modelRunContextLink = model.getRunContextLink()
+    if(modelRunContextLink.getIsActive()) {
+        modelRunContextLink.getModelRunContext().futureExecuteAction(actionData)
     }
 }

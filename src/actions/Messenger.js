@@ -1,3 +1,4 @@
+import {doAction} from "/apogeejs-model-lib/src/actions/action.js";
 
 /** This is a messenger class for sending action messages. 
  * If the send fails, and exception will be thrown. */
@@ -40,7 +41,7 @@ export default class Messenger {
         actionData.memberId = member.getId();
         actionData.data = data;
 
-        this.runContextLink.executeAction(actionData);
+        this._executeMessengerAction(actionData)
     }
 
     /** This is similar to dataUpdate except is allows multiple values to be set.
@@ -76,12 +77,29 @@ export default class Messenger {
         actionData.action = "compoundAction";
         actionData.actions = actionList;
 
-        this.runContextLink.executeAction(actionData);
+        this._executeMessengerAction(actionData)
     }
     
     //=====================
     // Private Functions
     //=====================
+
+    _executeMessengerAction(actionData) {
+
+        //this is the latest model in the run context on which actions are being/were executed
+        let currentModel = this.runContextLink.getCurrentModel();
+        if(!currentModel) return;
+
+        if(currentModel.isActionInProgress()) {
+            //This is an action sent during an action calculation - do short circuit execution
+            doAction(currentModel,actionData);
+        }
+        else {
+            //no action in process
+            //run this as an external command, asynchronously
+            setTimeout(() => this.getModelRunContext().futureExecuteAction(actionData),0)
+        }
+    }
     
     /** This method returns the member instance for a given local member name,
      * as defined from the source object context. */
