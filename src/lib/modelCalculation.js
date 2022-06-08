@@ -36,7 +36,7 @@ export function callRecalculateList(model,recalculateList) {
     var success = true;
     for(i = 0; i < recalculateList.length; i++) {
         dependent = recalculateList[i];
-        if(dependent.getCalcPending()) {
+        if(dependent.getCalcState() == "calc_needed") {
             dependent.calculate(model);   
         }
     }

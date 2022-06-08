@@ -88,14 +88,15 @@ export default class FolderFunction extends DependentMember {
 
     /** This updates the member data based on the function. It returns
      * true for success and false if there is an error.  */
-    calculate(model) {  
+    calculate(model) { 
+        this.setCalcState("calc_pending") 
 
         //if this function is sterilized, we will just set the value to invalid value.
         //This prevents any object which calls this function from updating. It is inended to be 
         //used in the virtual workspace assoicated with this folder function
         if(this.getField("sterilized")) {
             this.setResultInvalid(model);
-            this.clearCalcPending();
+            this.setCalcState("calc_ok")
             return;
         }
 
@@ -118,7 +119,7 @@ export default class FolderFunction extends DependentMember {
             }
         }
         
-        this.clearCalcPending();
+        this.setCalcState("calc_ok")
     }
 
     /** This method updates the dependencies of any children

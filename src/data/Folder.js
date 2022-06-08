@@ -90,6 +90,8 @@ export default class Folder extends DependentMember {
      * before any data is read from the folder. If we waited, we would get a circular dependecy if we trie to specify the 
      * name of a member including the path to it. We need to allow this to avoid name colisions at times.  */
     calculate(model) {
+        this.setCalcState("calc_pending")
+        
         //make sure the data is set in each impactor
         this.initializeImpactors(model);
         
@@ -107,7 +109,7 @@ export default class Folder extends DependentMember {
         }
 
         //clear calc pending flag
-        this.clearCalcPending();
+        this.setCalcState("calc_ok")
     }
 
     /** This method updates the dependencies of any children

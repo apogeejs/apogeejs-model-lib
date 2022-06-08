@@ -102,7 +102,7 @@ export default class CodeableMember extends DependentMember {
         }
         this.clearField("compiledInfo");
         
-        this.clearCalcPending();
+        this.setCalcState("calc_ok")
 
         this.updateDependencies(model,[]);
     }
@@ -151,22 +151,25 @@ export default class CodeableMember extends DependentMember {
 
     /** This method sets the data object for the member.  */
     calculate(model) {
+        this.setCalcState("calc_pending")
+
         //no calculation if there is no code. We shouldn't get here, but just in case.
         if(!this.hasCode()) {
+            this.setCalcState("calc_ok")
             return;
         }
 
         let compiledInfo = this.getField("compiledInfo");
         if(!compiledInfo) {
             this.setError(model,"Code not found for member: " + this.getName());
-            this.clearCalcPending();
+            this.setCalcState("calc_ok")
             return;
         }
         else if(!compiledInfo.valid) {
             let error = new Error(compiledInfo.errorMsg ? compiledInfo.errorMsg : "Unknown error parsing user code");
             if(compiledInfo.errorInfo) apogeeutil.appendErrorInfo(error,compiledInfo.errorInfo);
             this.setError(model,error);
-            this.clearCalcPending();
+            this.setCalcState("calc_ok")
             return;
         }
       
@@ -174,7 +177,19 @@ export default class CodeableMember extends DependentMember {
             this.processMemberFunction(model,compiledInfo.memberFunctionGenerator);
         }
         catch(error) {
-            
+
+            //NOPE!!
+            // if( (error == apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE) ||
+            //     (error == apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE) ||
+            //     (error.isDependsOnError) ) {
+
+            //         let state = this.getState();
+            //         if(state != apogeeutil.STATE_ERROR) {
+            //             this.calculateDependentState(model,true);
+            //         }
+                
+
+            // }        
             if(error == apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE) {
                 //This is not an error. I don't like to throw an error
                 //for an expected condition, but I didn't know how else
@@ -216,7 +231,7 @@ export default class CodeableMember extends DependentMember {
             }
         }
         
-        this.clearCalcPending();
+        this.setCalcState("calc_ok")
     }
 
     //----------------------------
@@ -576,8 +591,13 @@ export default class CodeableMember extends DependentMember {
         try {
             //make sure the data is set in each impactor
             this.initializeImpactors(model);
-            this.calculateDependentState(model,true);
+
             let state = this.getState();
+            if(state != apogeeutil.STATE_ERROR) {
+                this.calculateDependentState(model,true);
+                state = this.getState();
+            }
+            
             if((state == apogeeutil.STATE_ERROR)||(state == apogeeutil.STATE_PENDING)||(state == apogeeutil.STATE_INVALID)) {
                 //stop initialization if there is an issue in a dependent
                 this.dependencyInitInProgress = false;

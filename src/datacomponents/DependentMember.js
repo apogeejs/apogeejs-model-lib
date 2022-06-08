@@ -23,7 +23,7 @@ export default class DependentMember extends Member {
         //==============
         //Working variables
         //==============
-        this.calcPending = false;
+        this.calcState = "calc_ok"
     }
 
     /** This property tells if this object is a dependent.
@@ -38,14 +38,22 @@ export default class DependentMember extends Member {
     }
 
     /** This returns the calc pending flag.  */
-    getCalcPending() {
-        return this.calcPending;
-    }
+    // getCalcPending() {
+    //     return this.calcPending;
+    // }
 
     /** This sets the calc pending flag to false. It should be called when the 
      * calcultion is no longer needed.  */
-    clearCalcPending() {
-        this.calcPending = false;
+    // clearCalcPending() {
+    //     this.calcPending = false;
+    // }
+
+    getCalcState() {
+        return this.calcState
+    }
+
+    setCalcState(calcState) {
+        this.calcState = calcState
     }
 
     //Must be implemented in extending object
@@ -56,7 +64,7 @@ export default class DependentMember extends Member {
 
     /** This does any init needed for calculation.  */
     prepareForCalculate() {
-        this.calcPending = true;
+        this.calcState = "calc_needed";
 
         //clear any errors, and other state info
         this.clearState();
@@ -117,8 +125,13 @@ export default class DependentMember extends Member {
         let dependsOnMap = this.getField("dependsOnMap");
         for(var idString in dependsOnMap) {
             let impactor = model.lookupObjectById(idString);
-            if((impactor.isDependent)&&(impactor.getCalcPending())) {
-                impactor.calculate(model);
+            if(impactor.isDependent) {
+                if(impactor.getCalcState() == "calc_pending") {
+                    this.setError(model,"Circular reference error")
+                }
+                if(impactor.getCalcState() == "calc_needed") {
+                    impactor.calculate(model)
+                }
             }
         }
     }
@@ -163,3 +176,7 @@ export default class DependentMember extends Member {
         return dependenciesUpdated;
     }
 }
+
+const CALC_STATE_OK = "calc_ok"
+const CALC_STATE_PENDING = "calc_pending"
+const CALC_STATE_NEEDED = "calc_needed"
