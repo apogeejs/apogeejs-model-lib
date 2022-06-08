@@ -27,17 +27,17 @@ export function addDependsOnToRecalculateList(model,recalculateList,object) {
 }
 
 
+
 /** This calls execute for each member in the recalculate list. The return value
  * is false if there are any errors. */
 export function callRecalculateList(model,recalculateList) {
-    let dependent
-    let i
-    let success = true
+    var dependent;
+    var i;
+    var success = true;
     for(i = 0; i < recalculateList.length; i++) {
-        dependent = recalculateList[i]
+        dependent = recalculateList[i];
         if(dependent.getCalcPending()) {
-            let memberCalculateStack = [] //this is used for detecting ciruclar dependencies 
-            dependent.calculate(model,memberCalculateStack)   
+            dependent.calculate(model);   
         }
     }
     

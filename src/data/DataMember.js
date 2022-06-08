@@ -24,8 +24,8 @@ export default class DataMember extends CodeableMember {
     }
         
     /** This is he process member function from codeable. */
-    processMemberFunction(model,memberGenerator,memberCalculateStack) {
-        let initialized = this.initializeMemberFunction(model,memberCalculateStack);
+    processMemberFunction(model,memberGenerator) {
+        let initialized = this.initializeMemberFunction(model);
         if(initialized) {
             //the data is the output of the function
             let memberFunction = memberGenerator();

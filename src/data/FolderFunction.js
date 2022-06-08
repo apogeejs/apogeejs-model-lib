@@ -88,7 +88,7 @@ export default class FolderFunction extends DependentMember {
 
     /** This updates the member data based on the function. It returns
      * true for success and false if there is an error.  */
-     calculateImpl(model,memberCalculateStack) {  
+    calculate(model) {  
 
         //if this function is sterilized, we will just set the value to invalid value.
         //This prevents any object which calls this function from updating. It is inended to be 
@@ -100,9 +100,7 @@ export default class FolderFunction extends DependentMember {
         }
 
         //make sure the data is set in each impactor
-        
-        this.initializeImpactors(model,memberCalculateStack)
-
+        this.initializeImpactors(model);
         this.calculateDependentState(model,true);
 
         let state = this.getState();
@@ -119,6 +117,8 @@ export default class FolderFunction extends DependentMember {
                 this.setError(model,error);
             }
         }
+        
+        this.clearCalcPending();
     }
 
     /** This method updates the dependencies of any children
