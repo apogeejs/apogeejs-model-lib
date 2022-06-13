@@ -97,7 +97,7 @@ export default class Messenger {
         else {
             //no action in process
             //run this as an external command, asynchronously
-            setTimeout(() => this.getModelRunContext().futureExecuteAction(actionData),0)
+            setTimeout(() => this.runContextLink.getModelRunContext().futureExecuteAction(actionData),0)
         }
     }
     

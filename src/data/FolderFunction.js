@@ -244,6 +244,7 @@ export default class FolderFunction extends DependentMember {
                 let initRunContext = createRunContext();
                 let initRunContextLink = createRunContextLink(initRunContext);
                 baseVirtualModel = model.getCleanCopy(initRunContextLink);
+                initRunContext.setInitialModel(baseVirtualModel);
 
                 //we want to set the folder function as "sterilized" - this prevents any downstream work from the folder function updating
                 //(this is an synchronous command)
@@ -425,26 +426,53 @@ function createRunContextLink(runContext) {
 
 /** This is a dummy run context. It does not allow async functions. */
  class FolderFunctionRunContext {
-    constructor() {
-        this.isActive = true;
+
+    constructor(app) {
+        this.confirmedModel = null
+        this.inProcessModel = null
+        this.isActive = true
+    }
+
+    setInitialModel(baseVirtualModel) {
+        this.confirmedModel = baseVirtualModel
     }
 
     /** This method should return true if the run context is active and false if it has been stopped. For example, if an application
      * is the run context and it has been closed, this should return false.
      */
      getIsActive() {
-        return this.isActive;
+        return this.isActive 
     }
     
     deactivate() {
-        this.isActive = false;
+        this.isActive = false
     }
 
     getConfirmedModel() {
-        return null;
+        return this.confirmedModel
     }
 
-    futureExecuteAction(modelId,actionData) {
+    setInProcessModel(model) {
+        this.inProcessModel = model
+    }
+
+    // do we need these? -----
+    acceptInProcessModel() {
+        this.confimedModel = this.inProcessModel
+        this.inProcessModel = null
+
+    }
+
+    clearInProcessModel() {
+        this.inProcessModel = null
+    }
+    //----------------------------
+
+    getCurrentModel() {
+        return this.inProcessModel ? this.inProcessModel : this.confirmedModel
+    }
+
+    futureExecuteAction(actionData) {
         throw new Error("Async actions not allowed in folder function for now!");
     }
 
