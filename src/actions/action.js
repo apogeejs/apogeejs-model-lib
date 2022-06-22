@@ -306,7 +306,7 @@ function changeMapToChangeList(changeMap) {
         if(changeMapEntry.action == "transient") continue;
 
         let changeListEntry = {};
-        changeListEntry.event = changeMapEntry.instance.getType() + "_" + changeMapEntry.action;
+        changeListEntry.event = changeMapEntry.instance.getFieldObjectType() + "_" + changeMapEntry.action;
         changeListEntry.instance = changeMapEntry.instance;
         changeList.push(changeListEntry);
     }
